@@ -67,10 +67,12 @@ public final class Uncover {
 
 	String name = args[0];
 	args = Arrays.copyOfRange(args, 1, args.length);
+	// CommandBankクラスを用意する
 	Map<String, Class<? extends Command>> classMap
 	    = new HashMap<String, Class<? extends Command>>();
 	classMap.put(InitCommand.NAME, InitCommand.class);
 	classMap.put(CommitCommand.NAME, CommitCommand.class);
+	classMap.put(ReportCommand.NAME, ReportCommand.class);
 	Class<? extends Command> clazz = classMap.get(name);
 	if (clazz == null) {
 	    System.err.println("unknown command: " + name);

@@ -23,7 +23,7 @@ public final class ElementFunction extends Function {
     }
 
     /**
-       function要素からインスタンスを生成します。
+       functionGraph要素からインスタンスを生成します。
 
        @param e 要素
     */

@@ -34,4 +34,16 @@ public interface DB {
     void commit(final String projectName, final String revision,
 		final String timestamp, final String platform,
 		final Iterable<Function> allFunctions) throws DBException;
+
+    /**
+       データベースからリビジョンを取得します。
+
+       @param projectName プロジェクト名
+       @param revision リビジョン名
+       @return リビジョン
+       @throws DBException データベース操作に関するエラーが発生したと
+       きにスローします。
+    */
+    Revision getRevision(final String projectName, final String revision)
+	throws DBException;
 }

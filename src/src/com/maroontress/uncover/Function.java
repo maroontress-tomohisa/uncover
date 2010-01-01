@@ -169,12 +169,21 @@ public abstract class Function implements Comparable<Function> {
     }
 
     /**
+       gcnoファイル名を取得します。
+
+       @return gcnoファイル名
+    */
+    public final String getGCNOFile() {
+	return gcnoFile;
+    }
+
+    /**
        ソースファイル名を取得します。
 
        @return ソースファイル名
     */
-    public final String getFilename() {
-	return gcnoFile;
+    public final String getSourceFile() {
+	return sourceFile;
     }
 
     /**

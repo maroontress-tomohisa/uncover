@@ -3,12 +3,15 @@ package com.maroontress.uncover.sqlite;
 import com.maroontress.uncover.DB;
 import com.maroontress.uncover.DBException;
 import com.maroontress.uncover.Function;
+import com.maroontress.uncover.Revision;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
    SQLiteを使用したデータベースの実装です。
@@ -131,14 +134,14 @@ public final class SQLiteDB implements DB {
 			+ ");");
 	s.executeUpdate("CREATE TABLE " + Table.FUNCTION + " ("
 			+ "id INTEGER PRIMARY KEY, "
-			+ "name, filename, projectID"
+			+ "name, gcnoFile, projectID"
 			+ ");");
 	s.executeUpdate("CREATE TABLE " + Table.GRAPH + " ("
 			+ "id INTEGER PRIMARY KEY, "
 			+ "functionID, buildID"
 			+ ");");
 	s.executeUpdate("CREATE TABLE " + Table.GRAPH_SUMMARY + " ("
-			+ "graphID, checkSum, lineNumber, "
+			+ "graphID, checkSum, sourceFile, lineNumber, "
 			+ "complexity, allBlocks, executedBlocks, "
 			+ "allArcs, executedArcs"
 			+ ");");
@@ -252,7 +255,7 @@ public final class SQLiteDB implements DB {
 	throws SQLException {
 	PreparedStatement s = con.prepareStatement(
 	    "SELECT id FROM " + Table.FUNCTION
-	    + " WHERE name = ? and filename = ? and projectID = ?;");
+	    + " WHERE name = ? and gcnoFile = ? and projectID = ?;");
 	setParameter(s, new Object[] {name, filename, projectID});
 	ResultSet rs = s.executeQuery();
 	int k;
@@ -282,7 +285,7 @@ public final class SQLiteDB implements DB {
 				  final String projectID) throws SQLException {
 	PreparedStatement s = con.prepareStatement(
 	    "INSERT INTO " + Table.FUNCTION
-	    + " (name, filename, projectID) VALUES (?, ?, ?);");
+	    + " (name, gcnoFile, projectID) VALUES (?, ?, ?);");
 	setParameter(s, new Object[] {name, filename, projectID});
 	return insertNew(s);
     }
@@ -341,12 +344,13 @@ public final class SQLiteDB implements DB {
 	throws SQLException {
 	PreparedStatement s = con.prepareStatement(
 	    "INSERT INTO " + Table.GRAPH_SUMMARY
-	    + " (graphID, checkSum, lineNumber, complexity,"
+	    + " (graphID, checkSum, sourceFile, lineNumber, complexity,"
 	    + " allBlocks, executedBlocks, allArcs, executedArcs)"
-	    + " VALUES (?, ?, ?, ?, ?, ?, ?, ?);");
+	    + " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);");
 	setParameter(s, new Object[] {
 			 graphID,
 			 function.getCheckSum(),
+			 function.getSourceFile(),
 			 function.getLineNumber(),
 			 function.getComplexity(),
 			 function.getAllBlocks(),
@@ -367,7 +371,7 @@ public final class SQLiteDB implements DB {
 					 projectID);
 	    for (Function function : allFunctions) {
 		String functionID = getFunctionID(function.getName(),
-						  function.getFilename(),
+						  function.getGCNOFile(),
 						  projectID);
 		String graphID = appendGraphID(functionID, buildID);
 		appendGraphSummary(graphID, function);
@@ -376,6 +380,102 @@ public final class SQLiteDB implements DB {
 	} catch (SQLException e) {
 	    rollback();
 	    throw new DBException("failed to commit: " + e.getMessage(), e);
+	}
+    }
+
+    /**
+       ビルドの配列を取得します。
+
+       指定したリビジョンとプロジェクトIDにマッチするビルドの配列を返
+       します。
+
+       @param revision リビジョン
+       @param projectID プロジェクトID
+       @return ビルドの配列
+       @throws SQLException エラーが発生したときにスローします。
+    */
+    private Build[] queryBuilds(final String revision, final String projectID)
+	throws SQLException {
+	PreparedStatement s = con.prepareStatement(
+	    "SELECT * FROM " + Table.BUILD
+	    + " WHERE revision = ? and projectID = ?;");
+	setParameter(s, new Object[] {revision, projectID});
+	ResultSet rs = s.executeQuery();
+	ArrayList<Build> list = new ArrayList<Build>();
+	while (rs.next()) {
+	    list.add(new Build(rs));
+	}
+	return list.toArray(new Build[0]);
+    }
+
+    /**
+       指定したビルドの関数のリストを取得します。
+
+       @param buildID ビルドID
+       @return 関数のリスト
+       @throws SQLException エラーが発生したときにスローします。
+    */
+    private List<Function> getFunctions(final String buildID)
+	throws SQLException {
+	String format = String.format(
+	    "SELECT name, sourceFile, lineNumber,  gcnoFile, checkSum,"
+	    + " complexity, executedBlocks, allBlocks, executedArcs, allArcs"
+	    + " FROM %s g"
+	    + " INNER JOIN %s f ON f.id = g.functionID"
+	    + " INNER JOIN %s gs ON g.id = gs.graphID"
+	    + " WHERE g.buildID = ?;",
+	    Table.GRAPH, Table.FUNCTION, Table.GRAPH_SUMMARY);
+	PreparedStatement s = con.prepareStatement(format);
+	setParameter(s, new Object[] {buildID});
+	ResultSet rs = s.executeQuery();
+	List<Function> list = new ArrayList<Function>();
+	while (rs.next()) {
+	    Function function = new ResultSetFunction(rs);
+	    list.add(function);
+	}
+	return list;
+    }
+
+    /**
+       ビルドの配列から最良のものを選択します。
+
+       @param builds ビルドの配列
+       @return 選ばれたビルドのID
+    */
+    private String selectBestBuildID(final Build[] builds) {
+	return builds[0].getID();
+    }
+
+    /** {@inheritDoc} */
+    public Revision getRevision(final String projectName,
+				final String revision)
+	throws DBException {
+	/*
+	  public Revision getRevision(final String projectName,
+	  final String revision)
+	  を
+	  public Build[] getBuild(final String projectName,
+	  final String revision)
+	  と
+	  public Revision getRevision(final Build build)
+	  に分割
+	*/
+	try {
+	    String projectID = queryProjectID(projectName);
+	    if (projectID == null) {
+		throw new DBException("project not found: " + projectName);
+	    }
+	    Build[] builds = queryBuilds(revision, projectID);
+	    if (builds.length == 0) {
+		throw new DBException("revision not found: " + revision);
+	    }
+
+	    String buildID = selectBestBuildID(builds);
+
+	    return new Revision(getFunctions(buildID));
+	} catch (SQLException e) {
+	    throw new DBException("failed to get revision: "
+				  + e.getMessage(), e);
 	}
     }
 }

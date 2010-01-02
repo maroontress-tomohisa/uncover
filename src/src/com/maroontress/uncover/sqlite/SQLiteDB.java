@@ -4,6 +4,7 @@ import com.maroontress.uncover.DB;
 import com.maroontress.uncover.DBException;
 import com.maroontress.uncover.Function;
 import com.maroontress.uncover.Revision;
+import com.maroontress.uncover.Toolkit;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -429,8 +430,11 @@ public final class SQLiteDB implements DB {
 	setParameter(s, new Object[] {buildID});
 	ResultSet rs = s.executeQuery();
 	List<Function> list = new ArrayList<Function>();
+	Toolkit toolkit = Toolkit.getInstance();
+	ResultSetFunctionSource source = new ResultSetFunctionSource();
 	while (rs.next()) {
-	    Function function = new ResultSetFunction(rs);
+	    source.setResultSet(rs);
+	    Function function = toolkit.createFunction(source);
 	    list.add(function);
 	}
 	return list;

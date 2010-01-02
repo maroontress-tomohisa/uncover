@@ -1,5 +1,6 @@
 package com.maroontress.uncover.coverture;
 
+import com.maroontress.uncover.Toolkit;
 import com.maroontress.uncover.Function;
 import java.util.Iterator;
 import org.w3c.dom.Element;
@@ -7,6 +8,10 @@ import org.w3c.dom.NodeList;
 
 /**
    Functionのイテレータです。
+
+   Functionの生成に使用するツールキットは、イテレータ生成時に決定しま
+   す。したがって、イテレータを生成した後にツールキットを切り替えても、
+   そのイテレータは以前のツールキットを使用し続けます。
 */
 public final class FunctionIterator implements Iterator<Function> {
     /** functionGraph要素のノードリストです。 */
@@ -18,6 +23,12 @@ public final class FunctionIterator implements Iterator<Function> {
     /** ノードリストに含まれる要素の数です。 */
     private int length;
 
+    /** ツールキットのインスタンスです。 */
+    private Toolkit toolkit;
+
+    /** ツールキットのインスタンスです。 */
+    private ElementFunctionSource source;
+
     /**
        Functionのイテレータを生成します。
 
@@ -27,6 +38,8 @@ public final class FunctionIterator implements Iterator<Function> {
 	this.allFunctions = allFunctions;
 	offset = 0;
 	length = allFunctions.getLength();
+	toolkit = Toolkit.getInstance();
+	source = new ElementFunctionSource();
     }
 
     /** {@inheritDoc} */
@@ -36,9 +49,9 @@ public final class FunctionIterator implements Iterator<Function> {
 
     /** {@inheritDoc} */
     public Function next() {
-	Element e = (Element) allFunctions.item(offset);
+	source.setElement((Element) allFunctions.item(offset));
 	++offset;
-	return new ElementFunction(e);
+	return toolkit.createFunction(source);
     }
 
     /** {@inheritDoc} */

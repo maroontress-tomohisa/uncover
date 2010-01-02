@@ -20,19 +20,6 @@ public final class Revision {
     private Map<Function, Integer> complexityRankMap;
 
     /**
-       関数から値を取得するインタフェイスです。
-    */
-    private interface ValueHolder<T> {
-	/**
-	   関数から値を取得します。
-
-	   @param function 関数
-	   @return 値
-	*/
-        T getValue(Function function);
-    }
-
-    /**
        インスタンスを生成します。
 
        @param list 関数のリスト
@@ -48,39 +35,12 @@ public final class Revision {
 
         Function[] array = createFunctionArray();
         Arrays.sort(array, Function.COMPLEXITY_COMPARATOR);
-        complexityRankMap = createRankMap(array, new ValueHolder<Integer>() {
-            public Integer getValue(final Function function) {
+	RankMapFactory complexityRankMapFactory = new RankMapFactory() {
+	    public int getIntValue(final Function function) {
                 return function.getComplexity();
-            }
-        });
-    }
-
-    /**
-       関数の整数値順にランキングを求め、関数とランキングのマップを生
-       成します。
-
-       @param array 関数の配列（整数値順にソート済み）
-       @param holder 関数から整数型の値を取得するインタフェイス
-       @return 関数とランキングのマップ
-    */
-    private Map<Function, Integer>
-	createRankMap(final Function[] array,
-		      final ValueHolder<Integer> holder) {
-        Map<Function, Integer> map = new HashMap<Function, Integer>();
-        int rank = 1;
-        int n = array.length;
-        int lastValue = holder.getValue(array[0]);
-
-        map.put(array[0], rank);
-        for (int k = 1; k < n; ++k) {
-            int value = holder.getValue(array[k]);
-            if  (lastValue != value) {
-                lastValue = value;
-                rank = k + 1;
-            }
-            map.put(array[k], rank);
-        }
-	return map;
+	    }
+	};
+	complexityRankMap = complexityRankMapFactory.create(array);
     }
 
     /**

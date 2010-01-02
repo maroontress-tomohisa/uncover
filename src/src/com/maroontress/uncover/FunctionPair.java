@@ -7,16 +7,18 @@ import java.util.Comparator;
 */
 public final class FunctionPair {
     /** 複雑度順にソートするためのコンパレータです。 */
-    public static final
-    Comparator<FunctionPair> COMPLEXITY_DELTA_COMPARATOR;
+    public static final Comparator<FunctionPair> COMPLEXITY_DELTA_COMPARATOR;
 
-    /** 基本ブロック数順にソートするためのコンパレータです。 */
-    public static final
-    Comparator<FunctionPair> ALL_BLOCKS_DELTA_COMPARATOR;
+    /**
+       基本ブロック数の差分順にソートするためのコンパレータです。
+    */
+    public static final Comparator<FunctionPair> ALL_BLOCKS_DELTA_COMPARATOR;
 
-    /** 未実行の基本ブロック数順にソートするためのコンパレータです。 */
-    public static final
-    Comparator<FunctionPair> UNEXECUTED_BLOCKS_DELTA_COMPARATOR;
+    /**
+       未実行の基本ブロック数の差分順にソートするためのコンパレータです。
+    */
+    public static final Comparator<FunctionPair>
+    UNEXECUTED_BLOCKS_DELTA_COMPARATOR;
 
     /** 左の関数です。 */
     private Function left;
@@ -25,44 +27,32 @@ public final class FunctionPair {
     private Function right;
 
     static {
-	COMPLEXITY_DELTA_COMPARATOR = new Comparator<FunctionPair>() {
-	    public int compare(final FunctionPair p1, final FunctionPair p2) {
-		int d;
-
-		int d1 = p1.getComplexityDelta();
-		int d2 = p2.getComplexityDelta();
-		if ((d = -(d1 - d2)) != 0) {
-		    return d;
-		}
-		return p1.right.compareTo(p2.right);
+	COMPLEXITY_DELTA_COMPARATOR = new FunctionPairComparator() {
+	    public int getInt(final FunctionPair p) {
+		return p.getComplexityDelta();
 	    }
 	};
-
-	ALL_BLOCKS_DELTA_COMPARATOR = new Comparator<FunctionPair>() {
-	    public int compare(final FunctionPair p1, final FunctionPair p2) {
-		int d;
-
-		int d1 = p1.getAllBlocksDelta();
-		int d2 = p2.getAllBlocksDelta();
-		if ((d = -(d1 - d2)) != 0) {
-		    return d;
-		}
-		return p1.right.compareTo(p2.right);
+	ALL_BLOCKS_DELTA_COMPARATOR = new FunctionPairComparator() {
+	    public int getInt(final FunctionPair p) {
+		return p.getAllBlocksDelta();
 	    }
 	};
-
-	UNEXECUTED_BLOCKS_DELTA_COMPARATOR = new Comparator<FunctionPair>() {
-	    public int compare(final FunctionPair p1, final FunctionPair p2) {
-		int d;
-
-		int d1 = p1.getUnexecutedBlocksDelta();
-		int d2 = p2.getUnexecutedBlocksDelta();
-		if ((d = -(d1 - d2)) != 0) {
-		    return d;
-		}
-		return p1.right.compareTo(p2.right);
+	UNEXECUTED_BLOCKS_DELTA_COMPARATOR = new FunctionPairComparator() {
+	    public int getInt(final FunctionPair p) {
+		return p.getUnexecutedBlocksDelta();
 	    }
 	};
+    }
+
+    /**
+       2つの関数ペアをデフォルトの方式で比較します。
+
+       @param p1 関数ペア
+       @param p2 関数ペア
+       @return p1 < p2ならば負、p1 > p2ならば正、そうでなければ0
+    */
+    public static int compare(final FunctionPair p1, final FunctionPair p2) {
+	return Function.DEFAULT_COMPARATOR.compare(p1.right, p2.right);
     }
 
     /**

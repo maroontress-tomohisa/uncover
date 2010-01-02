@@ -5,11 +5,18 @@ import com.maroontress.uncover.sqlite.SQLiteDB;
 /**
    デフォルトのツールキットです。
 */
-public class DefaultToolkit extends Toolkit {
+public final class DefaultToolkit extends Toolkit {
     /**
        {@inheritDoc}
     */
-    public final DB createDB(final String subname) throws DBException {
+    public DB createDB(final String subname) throws DBException {
 	return new SQLiteDB(subname);
+    }
+
+    /**
+       {@inheritDoc}
+    */
+    public Function createFunction(final FunctionSource source) {
+	return new Function(source);
     }
 }

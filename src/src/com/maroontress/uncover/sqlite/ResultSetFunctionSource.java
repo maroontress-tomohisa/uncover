@@ -1,6 +1,7 @@
 package com.maroontress.uncover.sqlite;
 
 import com.maroontress.uncover.FunctionSource;
+import java.lang.reflect.Field;
 import java.sql.SQLException;
 import java.sql.ResultSet;
 
@@ -51,16 +52,20 @@ public final class ResultSetFunctionSource implements FunctionSource {
        @throws SQLException エラーが発生したときにスローします。
     */
     public void setResultSet(final ResultSet row) throws SQLException {
-	name = row.getString("name");
-	sourceFile = row.getString("sourceFile");
-	lineNumber = row.getInt("lineNumber");
-	gcnoFile = row.getString("gcnoFile");
-	checkSum = row.getString("checkSum");
-	complexity = row.getInt("complexity");
-	executedBlocks = row.getInt("executedBlocks");
-	allBlocks = row.getInt("allBlocks");
-	executedArcs = row.getInt("executedArcs");
-	allArcs = row.getInt("allArcs");
+	Field[] allField = this.getClass().getDeclaredFields();
+	try {
+	    for (Field field : allField) {
+		String name = field.getName();
+		Class<?> clazz = field.getType();
+		if (clazz == int.class) {
+		    field.setInt(this, row.getInt(name));
+		} else {
+		    field.set(this, row.getString(name));
+		}
+	    }
+	} catch (IllegalAccessException e) {
+	    throw new RuntimeException("internal error", e);
+	}
     }
 
     /** {@inheritDoc} */

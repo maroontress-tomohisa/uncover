@@ -233,6 +233,7 @@ public final class SQLiteDB implements DB {
     private String appendBuild(final String revision, final String timestamp,
 			       final String platform, final String projectID)
 	throws SQLException {
+	// リフレクションで書く
 	PreparedStatement s = con.prepareStatement(
 	    "INSERT INTO " + Table.BUILD
 	    + " (revision, timestamp, platform, projectID)"
@@ -343,6 +344,7 @@ public final class SQLiteDB implements DB {
     private String appendGraphSummary(final String graphID,
 				      final Function function)
 	throws SQLException {
+	// リフレクションで書く
 	PreparedStatement s = con.prepareStatement(
 	    "INSERT INTO " + Table.GRAPH_SUMMARY
 	    + " (graphID, checkSum, sourceFile, lineNumber, complexity,"

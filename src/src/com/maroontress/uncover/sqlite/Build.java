@@ -1,5 +1,6 @@
 package com.maroontress.uncover.sqlite;
 
+import java.lang.reflect.Field;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -29,12 +30,15 @@ public final class Build {
        @throws SQLException エラーが発生したときにスローします。
     */
     public Build(final ResultSet row) throws SQLException {
-	// リフレクションで書きたい
-	id = row.getString("id");
-	revision = row.getString("revision");
-	timestamp = row.getString("timestamp");
-	platform = row.getString("platform");
-	projectID = row.getString("projectID");
+	Field[] allField = this.getClass().getDeclaredFields();
+	try {
+	    for (Field field : allField) {
+		String name = field.getName();
+		field.set(this, row.getString(name));
+	    }
+	} catch (IllegalAccessException e) {
+	    throw new RuntimeException("internal error", e);
+	}
     }
 
     /**

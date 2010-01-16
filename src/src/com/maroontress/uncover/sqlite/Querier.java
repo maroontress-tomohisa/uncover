@@ -1,6 +1,8 @@
 package com.maroontress.uncover.sqlite;
 
+import java.lang.reflect.Field;
 import java.sql.PreparedStatement;
+import java.sql.SQLException;
 
 /**
    テーブルに行単位で操作する機能を提供します。
@@ -13,6 +15,9 @@ public abstract class Querier<T extends Row> {
 
     /** 行のインスタンスです。 */
     private T instance;
+
+    /** 行のインスタンスのフィールドです。 */
+    private Field[] allFields;
 
     /**
        コンストラクタです。
@@ -30,6 +35,10 @@ public abstract class Querier<T extends Row> {
     */
     public final void setRow(final T instance) {
 	this.instance = instance;
+	allFields = instance.getClass().getDeclaredFields();
+	for (Field field : allFields) {
+	    field.setAccessible(true);
+	}
     }
 
     /**
@@ -48,5 +57,28 @@ public abstract class Querier<T extends Row> {
     */
     protected final PreparedStatement getStatement() {
 	return ps;
+    }
+
+    /**
+       コンパイル済みステートメントに、行に含まれる値をパラメータとし
+       て設定します。
+
+       @throws SQLException クエリにエラーが発生したときにスローします。
+    */
+    protected final void setParameters() throws SQLException {
+	int offset = 1;
+	try {
+	    for (Field field : allFields) {
+		Class<?> clazz = field.getType();
+		if (clazz == int.class) {
+		    ps.setInt(offset, field.getInt(instance));
+		} else {
+		    ps.setString(offset, (String) field.get(instance));
+		}
+		++offset;
+	    }
+	} catch (IllegalAccessException e) {
+	    throw new RuntimeException("internal error", e);
+	}
     }
 }

@@ -3,8 +3,6 @@ package com.maroontress.uncover.sqlite;
 import java.lang.reflect.Field;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
    クエリを発行するインスタンスを生成します。
@@ -18,8 +16,8 @@ public final class QuerierFactory<T extends Row> {
     /** テーブル名です。 */
     private String tableName;
 
-    /** フィールド名のリストです。 */
-    private List<String> list;
+    /** フィールドの配列です。 */
+    private Field[] allFields;
 
     /**
        コンストラクタです。
@@ -32,12 +30,7 @@ public final class QuerierFactory<T extends Row> {
 			  final Class<T> clazz) {
 	this.con = con;
 	this.tableName = tableName;
-	list = new ArrayList<String>();
-
-	Field[] allField = clazz.getDeclaredFields();
-	for (Field field : allField) {
-	    list.add(field.getName());
-	}
+	allFields = clazz.getDeclaredFields();
     }
 
     /**
@@ -48,14 +41,10 @@ public final class QuerierFactory<T extends Row> {
     */
     public Adder<T> createAdder() throws SQLException {
 	String s = "INSERT INTO " + tableName + " (";
-	String prefix = "";
-	for (String name : list) {
-	    s += prefix + name;
-	    prefix = ", ";
-	}
+	s += FieldArray.concatNames(allFields, ", ");
 	s += ") VALUES (";
-	int n = list.size();
-	prefix = "";
+	int n = allFields.length;
+	String prefix = "";
 	for (int k = 0; k < n; ++k) {
 	    s += prefix + "?";
 	    prefix = ", ";
@@ -75,8 +64,8 @@ public final class QuerierFactory<T extends Row> {
 	throws SQLException {
 	String s = "SELECT " + colNames + " FROM " + tableName + " WHERE ";
 	String prefix = "";
-	for (String name : list) {
-	    s += prefix + name + " = ?";
+	for (Field field : allFields) {
+	    s += prefix + field.getName() + " = ?";
 	    prefix = "and ";
 	}
 	s += ";";

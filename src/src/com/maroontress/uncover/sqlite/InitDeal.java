@@ -27,27 +27,24 @@ public final class InitDeal {
     */
     public void run() throws SQLException {
 	Statement s = con.createStatement();
-	// リフレクションで書く
 	s.executeUpdate("CREATE TABLE " + Table.PROJECT + " ("
 			+ "id INTEGER PRIMARY KEY, "
-			+ "name"
+			+ FieldArray.concatNames(ProjectRow.class, ", ")
 			+ ");");
 	s.executeUpdate("CREATE TABLE " + Table.BUILD + " ("
 			+ "id INTEGER PRIMARY KEY, "
-			+ "revision, timestamp, platform, projectID"
+			+ FieldArray.concatNames(BuildRow.class, ", ")
 			+ ");");
 	s.executeUpdate("CREATE TABLE " + Table.FUNCTION + " ("
 			+ "id INTEGER PRIMARY KEY, "
-			+ "name, gcnoFile, projectID"
+			+ FieldArray.concatNames(FunctionRow.class, ", ")
 			+ ");");
 	s.executeUpdate("CREATE TABLE " + Table.GRAPH + " ("
 			+ "id INTEGER PRIMARY KEY, "
-			+ "functionID, buildID"
+			+ FieldArray.concatNames(GraphRow.class, ", ")
 			+ ");");
 	s.executeUpdate("CREATE TABLE " + Table.GRAPH_SUMMARY + " ("
-			+ "graphID, checkSum, sourceFile, lineNumber, "
-			+ "complexity, allBlocks, executedBlocks, "
-			+ "allArcs, executedArcs"
+			+ FieldArray.concatNames(GraphSummaryRow.class, ", ")
 			+ ");");
     }
 }

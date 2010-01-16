@@ -123,10 +123,26 @@ public final class CommitCommand extends Command {
     */
     public void run() {
 	try {
-	    Parser parser = new Parser(xmlFile);
+	    final Parser parser = new Parser(xmlFile);
 	    String subname = getProperties().getDBFile();
 	    DB db = Toolkit.getInstance().createDB(subname);
-	    db.commit(projectName, revision, timestamp, platform, parser);
+	    db.commit(new CommitSource() {
+		public String getProjectName() {
+		    return projectName;
+		}
+		public String getRevision() {
+		    return revision;
+		}
+		public String getTimestamp() {
+		    return timestamp;
+		}
+		public String getPlatform() {
+		    return platform;
+		}
+		public Iterable<Function> getAllFunctions() {
+		    return parser;
+		}
+	    });
 	    db.close();
 	} catch (ParsingException e) {
             e.printStackTrace();

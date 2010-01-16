@@ -23,17 +23,11 @@ public interface DB {
     /**
        データベースに関数情報を登録します。
 
-       @param projectName プロジェクト名
-       @param revision リビジョン
-       @param timestamp タイムスタンプ
-       @param platform プラットフォーム
-       @param allFunctions 関数のイテレータのファクトリ
+       @param source 登録する情報のソース
        @throws DBException データベース操作に関するエラーが発生したと
        きにスローします。
     */
-    void commit(final String projectName, final String revision,
-		final String timestamp, final String platform,
-		final Iterable<Function> allFunctions) throws DBException;
+    void commit(final CommitSource source) throws DBException;
 
     /**
        データベースからリビジョンを取得します。

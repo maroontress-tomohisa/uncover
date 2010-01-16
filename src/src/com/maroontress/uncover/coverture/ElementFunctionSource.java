@@ -2,6 +2,7 @@ package com.maroontress.uncover.coverture;
 
 import com.maroontress.uncover.FunctionSource;
 import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
 /**
    Covertureの出力ファイルから関数を生成するための関数ソースです。
@@ -9,6 +10,12 @@ import org.w3c.dom.Element;
 public final class ElementFunctionSource implements FunctionSource {
     /** functionGraph要素です。 */
     private Element elem;
+
+    /** アークの総数です。 */
+    private int allArcs;
+
+    /** 実行済みアークの数です。 */
+    private int executedArcs;
 
     /**
        インスタンスを生成します。
@@ -23,6 +30,21 @@ public final class ElementFunctionSource implements FunctionSource {
     */
     public void setElement(final Element elem) {
 	this.elem = elem;
+
+	allArcs = 0;
+	executedArcs = 0;
+	NodeList arcList = elem.getElementsByTagName("arc");
+	int n = arcList.getLength();
+	for (int k = 0; k < n; ++k) {
+	    Element arc = (Element) arcList.item(k);
+	    if (arc.getAttribute("fake").equals("true")) {
+		continue;
+	    }
+	    ++allArcs;
+	    if (getIntAttribute(arc, "count") > 0) {
+		++executedArcs;
+	    }
+	}
     }
 
     /** {@inheritDoc} */
@@ -68,12 +90,12 @@ public final class ElementFunctionSource implements FunctionSource {
 
     /** {@inheritDoc} */
     public int getExecutedArcs() {
-	return 0;
+	return executedArcs;
     }
 
     /** {@inheritDoc} */
     public int getAllArcs() {
-	return 0;
+	return allArcs;
     }
 
     /**

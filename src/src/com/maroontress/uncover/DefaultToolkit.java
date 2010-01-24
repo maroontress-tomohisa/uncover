@@ -19,4 +19,11 @@ public final class DefaultToolkit extends Toolkit {
     public Function createFunction(final FunctionSource source) {
 	return new Function(source);
     }
+
+    /**
+       {@inheritDoc}
+    */
+    public Build createBuild(final BuildSource source) {
+	return new Build(source);
+    }
 }

@@ -27,17 +27,37 @@ public interface DB {
        @throws DBException データベース操作に関するエラーが発生したと
        きにスローします。
     */
-    void commit(final CommitSource source) throws DBException;
+    void commit(CommitSource source) throws DBException;
 
     /**
-       データベースからリビジョンを取得します。
+       同じリビジョンのビルドを取得します。
 
        @param projectName プロジェクト名
        @param revision リビジョン名
+       @return ビルドの配列
+       @throws DBException データベース操作に関するエラーが発生したと
+       きにスローします。
+    */
+    Build[] getBuilds(String projectName, String revision) throws DBException;
+
+    /**
+       ビルドを取得します。
+
+       @param projectName プロジェクト名
+       @param id ビルドID
+       @return ビルド
+       @throws DBException データベース操作に関するエラーが発生したと
+       きにスローします。
+    */
+    Build getBuild(String projectName, String id) throws DBException;
+
+    /**
+       リビジョンを取得します。
+
+       @param id ビルドID
        @return リビジョン
        @throws DBException データベース操作に関するエラーが発生したと
        きにスローします。
     */
-    Revision getRevision(final String projectName, final String revision)
-	throws DBException;
+    Revision getRevision(String id) throws DBException;
 }

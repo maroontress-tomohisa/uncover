@@ -51,4 +51,17 @@ public abstract class Toolkit {
        @return 関数
     */
     public abstract Function createFunction(final FunctionSource source);
+
+    /**
+       ビルドインスタンスを生成します。
+
+       ビルドソースから値を取得してビルドインスタンスを生成します。イ
+       ンスタンス生成の際にソースから値をすべてコピーします。したがっ
+       て、生成後にsourceを変更しても、生成したビルドインスタンスに影
+       響はありません。
+
+       @param source ビルドソース
+       @return ビルド
+    */
+    public abstract Build createBuild(final BuildSource source);
 }

@@ -1,13 +1,14 @@
 package com.maroontress.uncover.sqlite;
 
+import com.maroontress.uncover.BuildSource;
 import java.lang.reflect.Field;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
-   ビルドに関する情報を保持します。
+   クエリ結果からビルドを生成するためのビルドソースです。
 */
-public final class Build {
+public final class ResultSetBuildSource implements BuildSource {
     /** ビルドIDです。 */
     private String id;
 
@@ -20,16 +21,19 @@ public final class Build {
     /** プラットフォームです。 */
     private String platform;
 
-    /** プロジェクトIDです。 */
-    private String projectID;
-
     /**
        インスタンスを生成します。
+    */
+    public ResultSetBuildSource() {
+    }
 
-       @param row buildテーブルの行
+    /**
+       クエリ結果を設定します。
+
+       @param row ビルドの行
        @throws SQLException エラーが発生したときにスローします。
     */
-    public Build(final ResultSet row) throws SQLException {
+    public void setResultSet(final ResultSet row) throws SQLException {
 	Field[] allField = this.getClass().getDeclaredFields();
 	try {
 	    for (Field field : allField) {
@@ -41,12 +45,23 @@ public final class Build {
 	}
     }
 
-    /**
-       ビルドIDを取得します。
-
-       @return ID
-    */
+    /** {@inheritDoc} */
     public String getID() {
 	return id;
+    }
+
+    /** {@inheritDoc} */
+    public String getRevision() {
+	return revision;
+    }
+
+    /** {@inheritDoc} */
+    public String getTimestamp() {
+	return timestamp;
+    }
+
+    /** {@inheritDoc} */
+    public String getPlatform() {
+	return platform;
     }
 }

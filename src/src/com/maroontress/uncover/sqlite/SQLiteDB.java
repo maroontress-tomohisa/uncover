@@ -1,5 +1,6 @@
 package com.maroontress.uncover.sqlite;
 
+import com.maroontress.uncover.Build;
 import com.maroontress.uncover.CommitSource;
 import com.maroontress.uncover.DB;
 import com.maroontress.uncover.DBException;
@@ -146,10 +147,80 @@ public final class SQLiteDB implements DB {
 	setParameter(s, new Object[] {revision, projectID});
 	ResultSet rs = s.executeQuery();
 	ArrayList<Build> list = new ArrayList<Build>();
+	Toolkit tk = Toolkit.getInstance();
+	ResultSetBuildSource source = new ResultSetBuildSource();
 	while (rs.next()) {
-	    list.add(new Build(rs));
+	    source.setResultSet(rs);
+	    list.add(tk.createBuild(source));
 	}
-	return list.toArray(new Build[0]);
+	return list.toArray(new Build[list.size()]);
+    }
+
+    /** {@inheritDoc} */
+    public Build[] getBuilds(final String projectName,
+			     final String revision) throws DBException {
+	try {
+	    ProjectDeal projectDeal = new ProjectDeal(con);
+	    String projectID = projectDeal.queryID(projectName);
+	    if (projectID == null) {
+		throw new DBException("project not found: " + projectName);
+	    }
+	    Build[] builds = queryBuilds(revision, projectID);
+	    if (builds.length == 0) {
+		throw new DBException("revision not found: " + revision);
+	    }
+	    return builds;
+	} catch (SQLException e) {
+	    throw new DBException("failed to get builds: "
+				  + e.getMessage(), e);
+	}
+    }
+
+    /**
+       ビルドを取得します。
+
+       @param id ビルドID
+       @param projectID プロジェクトID
+       @return ビルドの配列
+       @throws SQLException エラーが発生したときにスローします。
+    */
+    private Build[] queryBuild(final String id,
+			     final String projectID) throws SQLException {
+	PreparedStatement s = con.prepareStatement(
+	    "SELECT * FROM " + Table.BUILD
+	    + " WHERE id = ? and projectID = ?;");
+	setParameter(s, new Object[] {id, projectID});
+	ResultSet rs = s.executeQuery();
+	ArrayList<Build> list = new ArrayList<Build>();
+	Toolkit tk = Toolkit.getInstance();
+	ResultSetBuildSource source = new ResultSetBuildSource();
+	while (rs.next()) {
+	    source.setResultSet(rs);
+	    list.add(tk.createBuild(source));
+	}
+	return list.toArray(new Build[list.size()]);
+    }
+
+    /** {@inheritDoc} */
+    public Build getBuild(final String projectName,
+			  final String id) throws DBException {
+	try {
+	    ProjectDeal projectDeal = new ProjectDeal(con);
+	    String projectID = projectDeal.queryID(projectName);
+	    if (projectID == null) {
+		throw new DBException("project not found: " + projectName);
+	    }
+	    Build[] builds = queryBuild(id, projectID);
+	    if (builds.length == 0) {
+		throw new DBException("not found: @" + id);
+	    }
+	    if (builds.length > 1) {
+		throw new DBException("internal error");
+	    }
+	    return builds[0];
+	} catch (SQLException e) {
+	    throw new DBException("failed to get build: " + e.getMessage(), e);
+	}
     }
 
     /**
@@ -183,43 +254,10 @@ public final class SQLiteDB implements DB {
 	return list;
     }
 
-    /**
-       ビルドの配列から最良のものを選択します。
-
-       @param builds ビルドの配列
-       @return 選ばれたビルドのID
-    */
-    private String selectBestBuildID(final Build[] builds) {
-	return builds[0].getID();
-    }
-
     /** {@inheritDoc} */
-    public Revision getRevision(final String projectName,
-				final String revision) throws DBException {
-	/*
-	  public Revision getRevision(final String projectName,
-	  final String revision)
-	  を
-	  public Build[] getBuild(final String projectName,
-	  final String revision)
-	  と
-	  public Revision getRevision(final Build build)
-	  に分割
-	*/
+    public Revision getRevision(final String id) throws DBException {
 	try {
-	    ProjectDeal projectDeal = new ProjectDeal(con);
-	    String projectID = projectDeal.queryID(projectName);
-	    if (projectID == null) {
-		throw new DBException("project not found: " + projectName);
-	    }
-	    Build[] builds = queryBuilds(revision, projectID);
-	    if (builds.length == 0) {
-		throw new DBException("revision not found: " + revision);
-	    }
-
-	    String buildID = selectBestBuildID(builds);
-
-	    return new Revision(getFunctions(buildID));
+	    return new Revision(getFunctions(id));
 	} catch (SQLException e) {
 	    throw new DBException("failed to get revision: "
 				  + e.getMessage(), e);

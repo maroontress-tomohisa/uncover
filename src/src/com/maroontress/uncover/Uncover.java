@@ -73,6 +73,7 @@ public final class Uncover {
 	classMap.put(InitCommand.NAME, InitCommand.class);
 	classMap.put(CommitCommand.NAME, CommitCommand.class);
 	classMap.put(ReportCommand.NAME, ReportCommand.class);
+	classMap.put(ListProjectsCommand.NAME, ListProjectsCommand.class);
 	Class<? extends Command> clazz = classMap.get(name);
 	if (clazz == null) {
 	    System.err.println("unknown command: " + name);

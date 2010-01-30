@@ -106,6 +106,35 @@ public final class SQLiteDB implements DB {
     }
 
     /**
+       プロジェクトの配列を取得します。
+
+       @return プロジェクトの配列
+       @throws SQLException エラーが発生したときにスローします。
+    */
+    private String[] queryProjects() throws SQLException {
+	PreparedStatement s = con.prepareStatement(
+	    "SELECT name FROM " + Table.PROJECT + ";");
+	ResultSet rs = s.executeQuery();
+	ArrayList<String> list = new ArrayList<String>();
+	while (rs.next()) {
+	    String name = rs.getString("name");
+	    list.add(name);
+	}
+	return list.toArray(new String[list.size()]);
+    }
+
+    /** {@inheritDoc} */
+    public String[] getProjects() throws DBException {
+	try {
+	    //return GetProjectsDeal(con).run();
+	    return queryProjects();
+	} catch (SQLException e) {
+	    throw new DBException("failed to get projects: "
+				  + e.getMessage(), e);
+	}
+    }
+
+    /**
        コンパイル済みのステートメントにパラメータを設定します。
 
        @param s ステートメント
@@ -233,6 +262,8 @@ public final class SQLiteDB implements DB {
     private List<Function> getFunctions(final String buildID)
 	throws SQLException {
 	String format = String.format(
+	    // FieldArray.concatNames(ResultSetFunctionSource.class, ",")
+	    // を使う
 	    "SELECT name, sourceFile, lineNumber,  gcnoFile, checkSum,"
 	    + " complexity, executedBlocks, allBlocks, executedArcs, allArcs"
 	    + " FROM %s g"

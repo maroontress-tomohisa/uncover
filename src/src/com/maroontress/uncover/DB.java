@@ -60,4 +60,13 @@ public interface DB {
        きにスローします。
     */
     Revision getRevision(String id) throws DBException;
+
+    /**
+       プロジェクト名の配列を取得します。
+
+       @return プロジェクト名の配列
+       @throws DBException データベース操作に関するエラーが発生したと
+       きにスローします。
+    */
+    String[] getProjects() throws DBException;
 }

@@ -1,7 +1,35 @@
 package com.maroontress.uncover.sqlite;
 
+import java.lang.reflect.Field;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
 /**
-   テーブルの行に関する情報を保持します。
+   テーブルとクエリ結果の行に関する情報を保持します。
 */
 public abstract class Row {
+    /**
+       クエリ結果を設定します。
+
+       @param row 関数の行
+       @throws SQLException エラーが発生したときにスローします。
+    */
+    public final void setResultSet(final ResultSet row) throws SQLException {
+	Field[] allFields = this.getClass().getDeclaredFields();
+	try {
+	    for (Field field : allFields) {
+		field.setAccessible(true);
+
+		String name = field.getName();
+		Class<?> clazz = field.getType();
+		if (clazz == int.class) {
+		    field.setInt(this, row.getInt(name));
+		} else {
+		    field.set(this, row.getString(name));
+		}
+	    }
+	} catch (IllegalAccessException e) {
+	    throw new RuntimeException("internal error", e);
+	}
+    }
 }

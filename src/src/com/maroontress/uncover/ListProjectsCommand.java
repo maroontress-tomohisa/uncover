@@ -41,7 +41,7 @@ public final class ListProjectsCommand extends Command {
 	    usage(opt);
 	}
 	if (args.length > 0) {
-	    System.err.println("too many arguments: " + args[1]);
+	    System.err.println("too many arguments: " + args[0]);
 	    usage(opt);
 	}
     }

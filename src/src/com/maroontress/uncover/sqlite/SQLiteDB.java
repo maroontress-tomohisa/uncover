@@ -294,4 +294,45 @@ public final class SQLiteDB implements DB {
 				  + e.getMessage(), e);
 	}
     }
+
+    /**
+       リビジョン名の配列を取得します。
+
+       指定したプロジェクトIDにマッチするリビジョン名の配列を返します。
+
+       @param projectID プロジェクトID
+       @return ビルドの配列
+       @throws SQLException エラーが発生したときにスローします。
+    */
+    private String[] queryRevisionNames(final String projectID)
+	throws SQLException {
+	PreparedStatement s = con.prepareStatement(
+	    "SELECT * FROM " + Table.BUILD
+	    + " WHERE projectID = ?;");
+	setParameter(s, new Object[] {projectID});
+	ResultSet rs = s.executeQuery();
+	ArrayList<String> list = new ArrayList<String>();
+	Toolkit tk = Toolkit.getInstance();
+	ResultSetBuildSource source = new ResultSetBuildSource();
+	while (rs.next()) {
+	    source.setResultSet(rs);
+	    list.add(tk.createBuild(source).getRevision());
+	}
+	return list.toArray(new String[list.size()]);
+    }
+
+    /** {@inheritDoc} */
+    public String[] getRevisionNames(String projectName) throws DBException {
+	try {
+	    ProjectDeal projectDeal = new ProjectDeal(con);
+	    String projectID = projectDeal.queryID(projectName);
+	    if (projectID == null) {
+		throw new DBException("project not found: " + projectName);
+	    }
+	    return queryRevisionNames(projectID);
+	} catch (SQLException e) {
+	    throw new DBException("failed to get revision names: "
+				  + e.getMessage(), e);
+	}
+    }
 }

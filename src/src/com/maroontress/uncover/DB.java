@@ -69,4 +69,14 @@ public interface DB {
        きにスローします。
     */
     String[] getProjects() throws DBException;
+
+    /**
+       リビジョン名の配列を取得します。
+
+       @param projectName プロジェクト名
+       @return リビジョンの配列
+       @throws DBException データベース操作に関するエラーが発生したと
+       きにスローします。
+    */
+    String[] getRevisionNames(String projectName) throws DBException;
 }

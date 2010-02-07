@@ -53,7 +53,7 @@ public final class ListProjectsCommand extends Command {
 	try {
 	    String subname = getProperties().getDBFile();
 	    DB db = Toolkit.getInstance().createDB(subname);
-	    String[] projects = db.getProjects();
+	    String[] projects = db.getProjectNames();
 	    for (String s : projects) {
 		System.out.println(s);
 	    }

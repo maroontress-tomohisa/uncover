@@ -111,7 +111,7 @@ public final class SQLiteDB implements DB {
        @return プロジェクトの配列
        @throws SQLException エラーが発生したときにスローします。
     */
-    private String[] queryProjects() throws SQLException {
+    private String[] queryProjectNames() throws SQLException {
 	PreparedStatement s = con.prepareStatement(
 	    "SELECT name FROM " + Table.PROJECT + ";");
 	ResultSet rs = s.executeQuery();
@@ -124,10 +124,9 @@ public final class SQLiteDB implements DB {
     }
 
     /** {@inheritDoc} */
-    public String[] getProjects() throws DBException {
+    public String[] getProjectNames() throws DBException {
 	try {
-	    //return GetProjectsDeal(con).run();
-	    return queryProjects();
+	    return queryProjectNames();
 	} catch (SQLException e) {
 	    throw new DBException("failed to get projects: "
 				  + e.getMessage(), e);

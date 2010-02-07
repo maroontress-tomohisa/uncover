@@ -322,7 +322,8 @@ public final class SQLiteDB implements DB {
     }
 
     /** {@inheritDoc} */
-    public String[] getRevisionNames(String projectName) throws DBException {
+    public String[] getRevisionNames(final String projectName)
+	throws DBException {
 	try {
 	    ProjectDeal projectDeal = new ProjectDeal(con);
 	    String projectID = projectDeal.queryID(projectName);

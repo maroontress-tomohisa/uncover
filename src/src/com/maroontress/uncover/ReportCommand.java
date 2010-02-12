@@ -2,7 +2,6 @@ package com.maroontress.uncover;
 
 import com.maroontress.cui.OptionListener;
 import com.maroontress.cui.Options;
-import com.maroontress.cui.OptionsParsingException;
 
 /**
    reportコマンドです。
@@ -34,40 +33,26 @@ public final class ReportCommand extends Command {
     */
     public ReportCommand(final Properties props, final String[] av) {
 	super(props);
-	final Options opt = new Options();
 
-	// このコードは抽象クラスに移す
-	opt.add("help", new OptionListener() {
-	    public void run(final String name, final String arg) {
-		usage(opt);
-	    }
-	}, "Show this message and exit.");
-
+	Options opt = getOptions();
 	opt.add("project", new OptionListener() {
 	    public void run(final String name, final String arg) {
 		projectName = arg;
 	    }
 	}, "ARG", "Specify a project name.  Required.");
 
-
-	String[] args = null;
-	try {
-	    args = opt.parse(av);
-	} catch (OptionsParsingException e) {
-	    System.err.println(e.getMessage());
-	    usage(opt);
-	}
+	String[] args = parseArguments(av);
 	if (args.length < 2) {
 	    System.err.println("too few arguments.");
-	    usage(opt);
+	    usage();
 	}
 	if (args.length > 2) {
 	    System.err.println("too many arguments: " + args[2]);
-	    usage(opt);
+	    usage();
 	}
 	if (projectName == null || projectName.isEmpty()) {
 	    System.err.println("--project=ARG must be specified.");
-	    usage(opt);
+	    usage();
 	}
 	oldRevision = args[0];
 	newRevision = args[1];

@@ -11,7 +11,7 @@ public final class InitCommand extends Command {
     public static final String ARGS = "";
 
     /** コマンドの説明です。 */
-    public static final String DESC = "Initializes a data base.";
+    public static final String DESC = "Initialize a database.";
 
     /**
        initコマンドのインスタンスを生成します。

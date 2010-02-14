@@ -17,7 +17,7 @@ public final class CommitCommand extends Command {
     public static final String ARGS = "FILE";
 
     /** コマンドの説明です。 */
-    public static final String DESC = "Commits FILE into a data base.";
+    public static final String DESC = "Commit FILE to the database.";
 
     /** プロジェクト名です。 */
     private String projectName;

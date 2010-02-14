@@ -13,7 +13,7 @@ public final class ListProjectsCommand extends Command {
     public static final String ARGS = "";
 
     /** コマンドの説明です。 */
-    public static final String DESC = "Lists projects in the database.";
+    public static final String DESC = "List projects in the database.";
 
     /**
        list-projectsコマンドのインスタンスを生成します。

@@ -14,7 +14,7 @@ public final class ListRevisionsCommand extends Command {
     public static final String ARGS = "";
 
     /** コマンドの説明です。 */
-    public static final String DESC = "Lists revisions in the database.";
+    public static final String DESC = "List revisions in the database.";
 
     /** プロジェクト名です。 */
     private String projectName;

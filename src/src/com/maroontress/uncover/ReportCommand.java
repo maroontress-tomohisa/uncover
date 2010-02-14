@@ -14,7 +14,7 @@ public final class ReportCommand extends Command {
     public static final String ARGS = "OLD_REV NEW_REV";
 
     /** コマンドの説明です。 */
-    public static final String DESC = "Outputs a report.";
+    public static final String DESC = "Output a report.";
 
     /** 古いリビジョンです。 */
     private String oldRevision;

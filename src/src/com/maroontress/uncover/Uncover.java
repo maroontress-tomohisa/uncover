@@ -11,7 +11,7 @@ import java.util.Arrays;
 */
 public final class Uncover {
     /** ヘルプメッセージのインデント幅です。 */
-    private static final int INDENT_WIDTH = 16;
+    private static final int INDENT_WIDTH = 18;
 
     /** バッファのサイズです。 */
     private static final int BUFFER_SIZE = 4096;

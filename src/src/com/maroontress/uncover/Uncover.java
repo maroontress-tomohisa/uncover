@@ -40,6 +40,7 @@ public final class Uncover {
 	bank.addCommandClass(ReportCommand.class);
 	bank.addCommandClass(ListProjectsCommand.class);
 	bank.addCommandClass(ListRevisionsCommand.class);
+	bank.addCommandClass(DeleteRevisionCommand.class);
 
 	options.add("help", new OptionListener() {
 	    public void run(final String name, final String arg) {

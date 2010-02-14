@@ -12,6 +12,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -332,6 +333,106 @@ public final class SQLiteDB implements DB {
 	    return queryRevisionNames(projectID);
 	} catch (SQLException e) {
 	    throw new DBException("failed to get revision names: "
+				  + e.getMessage(), e);
+	}
+    }
+
+    /**
+       ビルドテーブルの行を削除した後、各テーブルで参照されなくなる行
+       を削除します。
+
+       @throws SQLException エラーが発生したときにスローします。
+    */
+    private void removeUnreferencedRows() throws SQLException {
+	Statement s = con.createStatement();
+	String sql;
+
+	sql = String.format(
+	    "DELETE FROM %s WHERE NOT EXISTS ("
+	    + "SELECT * FROM %s b WHERE b.id = %s.buildID);",
+	    Table.GRAPH, Table.BUILD, Table.GRAPH);
+	s.executeUpdate(sql);
+
+	sql = String.format(
+	    "DELETE FROM %s WHERE NOT EXISTS ("
+	    + "SELECT * FROM %s g WHERE g.id = %s.graphID);",
+	    Table.GRAPH_SUMMARY, Table.GRAPH, Table.GRAPH_SUMMARY);
+	s.executeUpdate(sql);
+
+	sql = String.format(
+	    "DELETE FROM %s WHERE NOT EXISTS"
+	    + " (SELECT * FROM %s g WHERE g.functionID = %s.id);",
+	    Table.FUNCTION, Table.GRAPH, Table.FUNCTION);
+	s.executeUpdate(sql);
+    }
+
+    /**
+       ビルドIDを指定してビルドを削除します。
+
+       @param id ビルドID
+       @param projectID プロジェクトID
+       @throws SQLException エラーが発生したときにスローします。
+    */
+    private void removeBuild(final String id,
+			     final String projectID) throws SQLException {
+	String format = String.format(
+	    "DELETE FROM %s WHERE id = ? and projectID = ?;", Table.BUILD);
+	PreparedStatement s = con.prepareStatement(format);
+	setParameter(s, new Object[] {id, projectID});
+	s.execute();
+	removeUnreferencedRows();
+    }
+
+    /** {@inheritDoc} */
+    public void deleteBuild(final String projectName,
+			    final String id) throws DBException {
+	try {
+	    ProjectDeal projectDeal = new ProjectDeal(con);
+	    String projectID = projectDeal.queryID(projectName);
+	    if (projectID == null) {
+		throw new DBException("project not found: " + projectName);
+	    }
+	    removeBuild(id, projectID);
+	    con.commit();
+	} catch (SQLException e) {
+	    rollback();
+	    throw new DBException("failed to delete build: "
+				  + e.getMessage(), e);
+	}
+    }
+
+    /**
+       リビジョンを指定してビルドを削除します。
+
+       @param revision リビジョン
+       @param projectID プロジェクトID
+       @throws SQLException エラーが発生したときにスローします。
+    */
+    private void removeBuilds(final String revision,
+			      final String projectID) throws SQLException {
+	String format = String.format(
+	    "DELETE FROM %s WHERE revision = ? and projectID = ?;",
+	    Table.BUILD);
+	PreparedStatement s = con.prepareStatement(format);
+	setParameter(s, new Object[] {revision, projectID});
+	s.execute();
+	removeUnreferencedRows();
+    }
+
+    /** {@inheritDoc} */
+    public void deleteBuilds(final String projectName,
+			     final String revision) throws DBException {
+	try {
+	    ProjectDeal projectDeal = new ProjectDeal(con);
+	    String projectID = projectDeal.queryID(projectName);
+	    if (projectID == null) {
+		throw new DBException("project not found: " + projectName);
+	    }
+	    removeBuilds(revision, projectID);
+	    con.commit();
+	} catch (SQLException e) {
+	    rollback();
+	    throw new DBException("failed to delete builds: "
 				  + e.getMessage(), e);
 	}
     }

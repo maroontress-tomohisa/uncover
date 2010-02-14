@@ -79,4 +79,24 @@ public interface DB {
        きにスローします。
     */
     String[] getRevisionNames(String projectName) throws DBException;
+
+    /**
+       同じリビジョンのビルドを削除します。
+
+       @param projectName プロジェクト名
+       @param revision リビジョン名
+       @throws DBException データベース操作に関するエラーが発生したと
+       きにスローします。
+    */
+    void deleteBuilds(String projectName, String revision) throws DBException;
+
+    /**
+       ビルドを削除します。
+
+       @param projectName プロジェクト名
+       @param id ビルドID
+       @throws DBException データベース操作に関するエラーが発生したと
+       きにスローします。
+    */
+    void deleteBuild(String projectName, String id) throws DBException;
 }

@@ -436,4 +436,45 @@ public final class SQLiteDB implements DB {
 				  + e.getMessage(), e);
 	}
     }
+
+    /**
+       プロジェクトを削除します。
+
+       @param projectID プロジェクトID
+       @throws SQLException エラーが発生したときにスローします。
+    */
+    private void removeProject(final String projectID) throws SQLException {
+	PreparedStatement s;
+	String format;
+
+	format = String.format("DELETE FROM %s WHERE id = ?;", Table.PROJECT);
+	s = con.prepareStatement(format);
+	setParameter(s, new Object[] {projectID});
+	s.execute();
+
+	format = String.format("DELETE FROM %s WHERE projectID = ?;",
+			       Table.BUILD);
+	s = con.prepareStatement(format);
+	setParameter(s, new Object[] {projectID});
+	s.execute();
+
+	removeUnreferencedRows();
+    }
+
+    /** {@inheritDoc} */
+    public void deleteProject(final String projectName) throws DBException {
+	try {
+	    ProjectDeal projectDeal = new ProjectDeal(con);
+	    String projectID = projectDeal.queryID(projectName);
+	    if (projectID == null) {
+		throw new DBException("project not found: " + projectName);
+	    }
+	    removeProject(projectID);
+	    con.commit();
+	} catch (SQLException e) {
+	    rollback();
+	    throw new DBException("failed to delete project: "
+				  + e.getMessage(), e);
+	}
+    }
 }

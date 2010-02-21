@@ -99,4 +99,13 @@ public interface DB {
        きにスローします。
     */
     void deleteBuild(String projectName, String id) throws DBException;
+
+    /**
+       プロジェクトを削除します。
+
+       @param projectName プロジェクト名
+       @throws DBException データベース操作に関するエラーが発生したと
+       きにスローします。
+    */
+    void deleteProject(String projectName) throws DBException;
 }

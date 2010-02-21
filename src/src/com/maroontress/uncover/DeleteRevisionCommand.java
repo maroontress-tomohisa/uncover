@@ -22,7 +22,7 @@ public final class DeleteRevisionCommand extends Command {
     /** リビジョンです。 */
     private String revision;
 
-    /** 新しいリビジョンです。 */
+    /** リビジョンに含まれるすべてのビルドを対象とするかどうかです。 */
     private boolean isAll;
 
     /**

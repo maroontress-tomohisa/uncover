@@ -9,6 +9,12 @@ import java.sql.SQLException;
 */
 public abstract class Row {
     /**
+       インスタンスを生成します。
+    */
+    protected Row() {
+    }
+
+    /**
        クエリ結果を設定します。
 
        @param row 関数の行

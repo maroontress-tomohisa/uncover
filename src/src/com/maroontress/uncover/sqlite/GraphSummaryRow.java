@@ -9,28 +9,28 @@ public final class GraphSummaryRow extends Row {
     /** グラフIDです。 */
     private String graphID;
 
-    /** */
+    /** チェックサムです。 */
     private String checkSum;
 
-    /** */
+    /** ソースファイルです。 */
     private String sourceFile;
 
-    /** */
+    /** 行番号です。 */
     private int lineNumber;
 
-    /** */
+    /** 複雑度です。 */
     private int complexity;
 
-    /** */
+    /** 基本ブロックの総数です。 */
     private int allBlocks;
 
-    /** */
+    /** 実行済みの基本ブロックの個数です。 */
     private int executedBlocks;
 
-    /** */
+    /** アークの総数です。 */
     private int allArcs;
 
-    /** */
+    /** 実行済みのアークの個数です。 */
     private int executedArcs;
 
     /**

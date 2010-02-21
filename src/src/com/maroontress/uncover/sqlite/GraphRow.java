@@ -7,7 +7,7 @@ public final class GraphRow extends Row {
     /** 関数IDです。 */
     private String functionID;
 
-    /** */
+    /** ビルドID */
     private String buildID;
 
     /**

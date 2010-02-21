@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <project default="all" xmlns:cs="antlib:com.puppycrawl.tools.checkstyle">
   <property name="prefix" location="/usr/local"/>
-  <property name="javadoc_linkurl" value="http://java.sun.com/j2se/1.5.0/ja/docs/ja/api/"/>
+  <property name="javadoc_linkurl" value="http://java.sun.com/javase/ja/6/docs/ja/api/"/>
   <property name="javac_options" value="-encoding EUC-JP -Xlint:unchecked -Xlint:deprecation -g"/>
 
   <target name="all" depends="uncover.jar"/>

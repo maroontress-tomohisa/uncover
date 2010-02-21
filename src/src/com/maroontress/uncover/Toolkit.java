@@ -12,6 +12,12 @@ public abstract class Toolkit {
     }
 
     /**
+       インスタンスを生成します。
+    */
+    protected Toolkit() {
+    }
+
+    /**
        ツールキットのインスタンスを取得します。
 
        @return ツールキットのインスタンス

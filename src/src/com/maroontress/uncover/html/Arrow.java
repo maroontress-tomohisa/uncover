@@ -8,6 +8,12 @@ import com.maroontress.uncover.FunctionPair;
 */
 public abstract class Arrow {
     /**
+       インスタンスを生成します。
+    */
+    protected Arrow() {
+    }
+
+    /**
        関数の指標変化の傾向や差分を表す文字列を取得します。
 
        @param v1 前の値

@@ -7,6 +7,12 @@ import com.maroontress.uncover.sqlite.SQLiteDB;
 */
 public final class DefaultToolkit extends Toolkit {
     /**
+       インスタンスを生成します。
+    */
+    public DefaultToolkit() {
+    }
+
+    /**
        {@inheritDoc}
     */
     public DB createDB(final String subname) throws DBException {

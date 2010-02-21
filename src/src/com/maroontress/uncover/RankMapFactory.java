@@ -8,6 +8,12 @@ import java.util.Map;
 */
 public abstract class RankMapFactory {
     /**
+       インスタンスを生成します。
+    */
+    protected RankMapFactory() {
+    }
+
+    /**
        関数の整数値順にランキングを求め、関数とランキングのマップを生
        成します。
 

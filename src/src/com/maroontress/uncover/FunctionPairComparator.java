@@ -7,6 +7,12 @@ import java.util.Comparator;
 */
 public abstract class FunctionPairComparator
     implements Comparator<FunctionPair> {
+    /**
+       インスタンスを生成します。
+    */
+    protected FunctionPairComparator() {
+    }
+
     /** {@inheritDoc} */
     public final int compare(final FunctionPair p1, final FunctionPair p2) {
 	int d = -(getInt(p1) - getInt(p2));

@@ -83,22 +83,36 @@ public abstract class Command {
     }
 
     /**
+       コマンドの実行で発生した例外を処理します。
+
+       @param e コマンドの実行に関する例外
+    */
+    private void handleException(final CommandException e) {
+	String subname = getProperties().getDBFile();
+	try {
+	    throw e.getCause();
+	} catch (DBException cause) {
+	    System.err.println(subname + ": " + e.getMessage());
+	    cause.printStackTrace();
+	} catch (MultipleBuildsException cause) {
+	    System.err.println(subname + ": " + e.getMessage());
+	    cause.printDescription(System.err);
+	} catch (Throwable cause) {
+	    cause.printStackTrace();
+	}
+    }
+
+    /**
        コマンドを実行します。
     */
     public final void run() {
 	try {
 	    runCommand();
 	} catch (CommandException e) {
-	    String subname = getProperties().getDBFile();
-	    Throwable t = e.getCause();
-	    if (t == null) {
+	    if (e.getCause() == null) {
 		e.printStackTrace();
-	    } else if (t instanceof DBException) {
-		System.err.println(subname + ": " + e.getMessage());
-		t.printStackTrace();
-	    } else if (t instanceof MultipleBuildsException) {
-		System.err.println(subname + ": " + e.getMessage());
-		((MultipleBuildsException) t).printDescription(System.err);
+	    } else {
+		handleException(e);
 	    }
 	    System.exit(1);
 	}

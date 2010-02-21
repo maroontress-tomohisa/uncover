@@ -53,8 +53,56 @@ public abstract class Command {
 
     /**
        コマンドを実行します。
+
+       @param db データベース
+       @throws CommandException コマンドの実行に関するエラーが発生した
+       ときにスローします。
     */
-    public abstract void run();
+    protected abstract void run(DB db) throws CommandException;
+
+    /**
+       コマンドを実行します。
+
+       @throws CommandException コマンドの実行に関するエラーが発生した
+       ときにスローします。
+    */
+    private void runCommand() throws CommandException {
+	String subname = getProperties().getDBFile();
+	DB db;
+	try {
+	    db = Toolkit.getInstance().createDB(subname);
+	} catch (DBException e) {
+	    throw new CommandException("can't open database.", e);
+	}
+	run(db);
+	try {
+	    db.close();
+	} catch (DBException e) {
+	    throw new CommandException("can't close database.", e);
+	}
+    }
+
+    /**
+       コマンドを実行します。
+    */
+    public final void run() {
+	try {
+	    runCommand();
+	} catch (CommandException e) {
+	    String subname = getProperties().getDBFile();
+	    Throwable t = e.getCause();
+	    if (t == null) {
+		e.printStackTrace();
+	    } else if (t instanceof DBException) {
+		System.err.println(subname + ": " + e.getMessage());
+		t.printStackTrace();
+	    } else if (t instanceof MultipleBuildsException) {
+		System.err.println(subname + ": " + e.getMessage());
+		((MultipleBuildsException) t).printDescription(System.err);
+	    }
+	    System.exit(1);
+	}
+    }
 
     /**
        オプションをパースして、コマンドの引数を取得します。

@@ -36,17 +36,14 @@ public final class ListProjectsCommand extends Command {
     /**
        {@inheritDoc}
     */
-    public void run() {
+    protected void run(final DB db) throws CommandException {
 	try {
-	    String subname = getProperties().getDBFile();
-	    DB db = Toolkit.getInstance().createDB(subname);
 	    String[] projects = db.getProjectNames();
 	    for (String s : projects) {
 		System.out.println(s);
 	    }
 	} catch (DBException e) {
-            e.printStackTrace();
-	    System.exit(1);
+	    throw new CommandException("can't list projects.", e);
 	}
     }
 }

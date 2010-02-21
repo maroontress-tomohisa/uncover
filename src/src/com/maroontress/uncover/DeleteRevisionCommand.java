@@ -64,32 +64,8 @@ public final class DeleteRevisionCommand extends Command {
     }
 
     /**
-       同じリビジョンのビルドを表示します。
-
-       @param rev リビジョン
-       @param builds ビルドの配列
-    */
-    private void printBuilds(final String rev, final Build[] builds) {
-	System.err.printf("revision '%s' has %d results:\n\n",
-			  rev, builds.length);
-	for (Build b : builds) {
-	    System.err.printf(""
-			      + "ID: @%s\n"
-			      + "Platform: %s\n"
-			      + "Timestamp: %s\n"
-			      + "\n",
-			      b.getID(), b.getPlatform(), b.getTimestamp());
-	}
-	System.err.printf("please specify the ID instead of '%s',"
-			  + " or add '--all' option.\n", rev);
-    }
-
-    /**
        プロジェクト名とリビジョン、またはビルドIDを指定して、ビルドを
        取得します。
-
-       リビジョンを指定し、そのリビジョンに該当するビルドが複数存在す
-       る場合は、それらのビルドをすべて表示して終了します。
 
        @param db データベース
        @param projectName プロジェクト名
@@ -97,17 +73,22 @@ public final class DeleteRevisionCommand extends Command {
        @return ビルド
        @throws DBException データベース操作に関するエラーが発生したと
        きにスローします。
+       @throws MultipleBuildsException 指定したリビジョンに複数のビル
+       ドが存在するときにスローします。
     */
     private Build getBuild(final DB db, final String projectName,
-			   final String rev) throws DBException {
+			   final String rev)
+	throws DBException, MultipleBuildsException {
+	// ReportCommand.getBuild()とまとめる
 	if (rev.startsWith("@")) {
 	    return db.getBuild(projectName, rev.substring(1));
 	}
 	Build[] builds = db.getBuilds(projectName, rev);
 	if (builds.length > 1) {
-	    // throw new MultipleBuildsException(rev, builds, howToFix);
-	    printBuilds(rev, builds);
-	    System.exit(1);
+	    String howToFix = String.format(
+		"please specify the ID instead of '%s',"
+		+ " or add '--all' option.\n", rev);
+	    throw new MultipleBuildsException(rev, builds, howToFix);
 	}
 	return builds[0];
     }
@@ -115,20 +96,20 @@ public final class DeleteRevisionCommand extends Command {
     /**
        {@inheritDoc}
     */
-    public void run() {
-	// run()の引数にdbを渡すようにする
+    protected void run(final DB db) throws CommandException {
 	try {
-	    String subname = getProperties().getDBFile();
-	    DB db = Toolkit.getInstance().createDB(subname);
 	    if (isAll) {
 		db.deleteBuilds(projectName, revision);
 	    } else {
 		Build build = getBuild(db, projectName, revision);
 		db.deleteBuild(projectName, build.getID());
 	    }
+	} catch (MultipleBuildsException e) {
+	    throw new CommandException(
+		"can't delete revision: " + revision, e);
 	} catch (DBException e) {
-            e.printStackTrace();
-	    System.exit(1);
+	    throw new CommandException(
+		"can't delete revision: " + revision, e);
 	}
     }
 }

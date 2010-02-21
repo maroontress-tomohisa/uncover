@@ -49,17 +49,14 @@ public final class ListRevisionsCommand extends Command {
     /**
        {@inheritDoc}
     */
-    public void run() {
+    protected void run(final DB db) throws CommandException {
 	try {
-	    String subname = getProperties().getDBFile();
-	    DB db = Toolkit.getInstance().createDB(subname);
 	    String[] revisions = db.getRevisionNames(projectName);
 	    for (String s : revisions) {
 		System.out.println(s);
 	    }
 	} catch (DBException e) {
-            e.printStackTrace();
-	    System.exit(1);
+	    throw new CommandException("can't list revisions", e);
 	}
     }
 }

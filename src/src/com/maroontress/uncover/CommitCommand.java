@@ -108,14 +108,12 @@ public final class CommitCommand extends Command {
     /**
        {@inheritDoc}
     */
-    public void run() {
+    protected void run(final DB db) throws CommandException {
 	try {
 	    final Parser parser = new Parser(xmlFile);
-	    String subname = getProperties().getDBFile();
-	    DB db = Toolkit.getInstance().createDB(subname);
 	    db.commit(new CommitSource() {
 		public String getProjectName() {
-		    return projectName;
+		return projectName;
 		}
 		public String getRevision() {
 		    return revision;
@@ -130,13 +128,10 @@ public final class CommitCommand extends Command {
 		    return parser;
 		}
 	    });
-	    db.close();
 	} catch (ParsingException e) {
-            e.printStackTrace();
-	    System.exit(1);
+	    throw new CommandException("can't import: " + xmlFile, e);
 	} catch (DBException e) {
-            e.printStackTrace();
-	    System.exit(1);
+	    throw new CommandException("failed to commit.", e);
 	}
     }
 }

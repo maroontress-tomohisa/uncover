@@ -32,15 +32,11 @@ public final class InitCommand extends Command {
     /**
        {@inheritDoc}
     */
-    public void run() {
+    protected void run(final DB db) throws CommandException {
 	try {
-	    String subname = getProperties().getDBFile();
-	    DB db = Toolkit.getInstance().createDB(subname);
 	    db.initialize();
-	    db.close();
 	} catch (DBException e) {
-            e.printStackTrace();
-	    System.exit(1);
+	    throw new CommandException("can't initialize.", e);
 	}
     }
 }

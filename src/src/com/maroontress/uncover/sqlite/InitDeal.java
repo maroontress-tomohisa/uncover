@@ -46,5 +46,11 @@ public final class InitDeal {
 	s.executeUpdate("CREATE TABLE " + Table.GRAPH_SUMMARY + " ("
 			+ FieldArray.concatNames(GraphSummaryRow.class, ", ")
 			+ ");");
+	s.executeUpdate("CREATE TABLE " + Table.GRAPH_BLOCK + " ("
+			+ FieldArray.concatNames(GraphBlockRow.class, ", ")
+			+ ");");
+	s.executeUpdate("CREATE TABLE " + Table.GRAPH_ARC + " ("
+			+ FieldArray.concatNames(GraphArcRow.class, ", ")
+			+ ");");
     }
 }

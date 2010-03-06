@@ -59,6 +59,45 @@ public abstract class Toolkit {
     public abstract Function createFunction(final FunctionSource source);
 
     /**
+       グラフインスタンスを生成します。
+
+       グラフソースから値を取得してグラフインスタンスを生成します。イ
+       ンスタンス生成の際にソースから値をすべてコピーします。したがっ
+       て、生成後にsourceを変更しても、生成したグラフインスタンスに影
+       響はありません。
+
+       @param source グラフソース
+       @return グラフ
+    */
+    public abstract Graph createGraph(final GraphSource source);
+
+    /**
+       ブロックインスタンスを生成します。
+
+       ブロックソースから値を取得してブロックインスタンスを生成します。
+       インスタンス生成の際にソースから値をすべてコピーします。したがっ
+       て、生成後にsourceを変更しても、生成したブロックインスタンスに
+       影響はありません。
+
+       @param source ブロックソース
+       @return ブロック
+    */
+    public abstract Block createBlock(final BlockSource source);
+
+    /**
+       アークインスタンスを生成します。
+
+       アークソースから値を取得してアークインスタンスを生成します。イ
+       ンスタンス生成の際にソースから値をすべてコピーします。したがっ
+       て、生成後にsourceを変更しても、生成したアークインスタンスに影
+       響はありません。
+       
+       @param source アークソース
+       @return アーク
+    */
+    public abstract Arc createArc(final ArcSource source);
+
+    /**
        ビルドインスタンスを生成します。
 
        ビルドソースから値を取得してビルドインスタンスを生成します。イ

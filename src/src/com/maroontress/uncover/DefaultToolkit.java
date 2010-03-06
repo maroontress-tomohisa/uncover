@@ -29,6 +29,27 @@ public final class DefaultToolkit extends Toolkit {
     /**
        {@inheritDoc}
     */
+    public Graph createGraph(final GraphSource source) {
+	return new Graph(source);
+    }
+
+    /**
+       {@inheritDoc}
+    */
+    public Block createBlock(final BlockSource source) {
+	return new Block(source);
+    }
+
+    /**
+       {@inheritDoc}
+    */
+    public Arc createArc(final ArcSource source) {
+	return new Arc(source);
+    }
+
+    /**
+       {@inheritDoc}
+    */
     public Build createBuild(final BuildSource source) {
 	return new Build(source);
     }

@@ -5,6 +5,7 @@ import com.maroontress.cui.Options;
 import com.maroontress.uncover.coverture.Parser;
 import com.maroontress.uncover.coverture.ParsingException;
 import java.util.Calendar;
+import java.util.Iterator;
 
 /**
    commitコマンドです。
@@ -124,7 +125,7 @@ public final class CommitCommand extends Command {
 		public String getPlatform() {
 		    return platform;
 		}
-		public Iterable<Function> getAllFunctions() {
+		public Iterable<FunctionGraph> getAllFunctionGraphs() {
 		    return parser;
 		}
 	    });

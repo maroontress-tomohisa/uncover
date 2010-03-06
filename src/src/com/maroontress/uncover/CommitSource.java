@@ -33,9 +33,9 @@ public interface CommitSource {
     String getPlatform();
 
     /**
-       関数のイテレータのファクトリを取得します。
+       関数グラフのイテレータのファクトリを取得します。
 
-       @return 関数のイテレータのファクトリ
+       @return 関数グラフのイテレータのファクトリ
     */
-    Iterable<Function> getAllFunctions();
+    Iterable<FunctionGraph> getAllFunctionGraphs();
 }

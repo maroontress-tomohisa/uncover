@@ -22,6 +22,12 @@ public final class Table {
     /** グラフサマリのテーブル名です。 */
     public static final String GRAPH_SUMMARY = PREFIX + "graphSummary";
 
+    /** グラフブロックのテーブル名です。 */
+    public static final String GRAPH_BLOCK = PREFIX + "graphBlock";
+
+    /** グラフアークのテーブル名です。 */
+    public static final String GRAPH_ARC = PREFIX + "graphArc";
+
     /**
        コンストラクタにはアクセスできません。
     */

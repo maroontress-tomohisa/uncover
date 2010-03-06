@@ -7,7 +7,8 @@ import org.w3c.dom.NodeList;
 /**
    Covertureの出力ファイルから関数を生成するための関数ソースです。
 */
-public final class ElementFunctionSource implements FunctionSource {
+public final class ElementFunctionSource extends ElementSource
+    implements FunctionSource {
     /** functionGraph要素です。 */
     private Element elem;
 
@@ -96,20 +97,5 @@ public final class ElementFunctionSource implements FunctionSource {
     /** {@inheritDoc} */
     public int getAllArcs() {
 	return allArcs;
-    }
-
-    /**
-       属性値を整数として取得します。
-
-       属性値が空文字列の場合は0を返します。
-
-       @param elem 要素
-       @param s 属性名
-       @return 属性値
-    */
-    private static int getIntAttribute(final Element elem, final String s) {
-	String v = elem.getAttribute(s);
-
-	return (v.equals("")) ? 0 : Integer.parseInt(v);
     }
 }

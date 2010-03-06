@@ -1,7 +1,11 @@
 package com.maroontress.uncover.sqlite;
 
+import com.maroontress.uncover.Arc;
+import com.maroontress.uncover.Block;
 import com.maroontress.uncover.CommitSource;
 import com.maroontress.uncover.Function;
+import com.maroontress.uncover.FunctionGraph;
+import com.maroontress.uncover.Graph;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -27,6 +31,12 @@ public final class CommitDeal {
 
     /** グラフサマリテーブルに行を追加するインスタンスです。 */
     private Adder<GraphSummaryRow> graphSummaryRowAdder;
+
+    /** グラフブロックテーブルに行を追加するインスタンスです。 */
+    private Adder<GraphBlockRow> graphBlockRowAdder;
+
+    /** グラフアークテーブルに行を追加するインスタンスです。 */
+    private Adder<GraphArcRow> graphArcRowAdder;
 
     /**
        インスタンスを生成します。
@@ -57,6 +67,14 @@ public final class CommitDeal {
 	graphSummaryRowAdder = new QuerierFactory<GraphSummaryRow>(
 	    con, Table.GRAPH_SUMMARY, GraphSummaryRow.class).createAdder();
 	graphSummaryRowAdder.setRow(new GraphSummaryRow());
+
+	graphBlockRowAdder = new QuerierFactory<GraphBlockRow>(
+	    con, Table.GRAPH_BLOCK, GraphBlockRow.class).createAdder();
+	graphBlockRowAdder.setRow(new GraphBlockRow());
+
+	graphArcRowAdder = new QuerierFactory<GraphArcRow>(
+	    con, Table.GRAPH_ARC, GraphArcRow.class).createAdder();
+	graphArcRowAdder.setRow(new GraphArcRow());
     }
 
     /**
@@ -104,8 +122,10 @@ public final class CommitDeal {
 	buildRowAdder.execute();
 	String buildID = buildRowAdder.getGeneratedKey(1);
 
-	Iterable<Function> allFunctions = source.getAllFunctions();
-	for (Function function : allFunctions) {
+	Iterable<FunctionGraph> allFunctionGraphs
+	    = source.getAllFunctionGraphs();
+	for (FunctionGraph functionGraph : allFunctionGraphs) {
+	    Function function = functionGraph.getFunction();
 	    functionRowFetcher.getRow().set(function.getName(),
 					    function.getGCNOFile(),
 					    projectID);
@@ -135,6 +155,18 @@ public final class CommitDeal {
 
 	    graphSummaryRowAdder.getRow().set(graphID, function);
 	    graphSummaryRowAdder.execute();
+
+	    Graph graph = functionGraph.getGraph();
+	    Block[] allBlocks = graph.getAllBlocks();
+	    for (Block block : allBlocks) {
+		graphBlockRowAdder.getRow().set(graphID, block);
+		graphBlockRowAdder.execute();
+	    }
+	    Arc[] allArcs = graph.getAllArcs();
+	    for (Arc arc : allArcs) {
+		graphArcRowAdder.getRow().set(graphID, arc);
+		graphArcRowAdder.execute();
+	    }
 	}
     }
 }

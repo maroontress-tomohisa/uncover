@@ -91,7 +91,7 @@ public abstract class Toolkit {
        ンスタンス生成の際にソースから値をすべてコピーします。したがっ
        て、生成後にsourceを変更しても、生成したアークインスタンスに影
        響はありません。
-       
+
        @param source アークソース
        @return アーク
     */

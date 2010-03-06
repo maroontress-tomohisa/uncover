@@ -2,7 +2,6 @@ package com.maroontress.uncover.coverture;
 
 import com.maroontress.uncover.ArcSource;
 import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 
 /**
    Covertureの出力ファイルからアークを生成するためのアークソースです。

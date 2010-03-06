@@ -5,7 +5,6 @@ import com.maroontress.cui.Options;
 import com.maroontress.uncover.coverture.Parser;
 import com.maroontress.uncover.coverture.ParsingException;
 import java.util.Calendar;
-import java.util.Iterator;
 
 /**
    commitコマンドです。

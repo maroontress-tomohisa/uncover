@@ -39,6 +39,7 @@ public final class ElementGraphSource extends ElementSource
 	   要素からインスタンスを生成します。
 
 	   @param elem 要素
+	   @return インスタンス
 	*/
 	protected abstract T create(Element elem);
 

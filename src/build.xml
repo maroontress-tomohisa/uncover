@@ -2,7 +2,7 @@
 <project default="all" xmlns:cs="antlib:com.puppycrawl.tools.checkstyle">
   <property name="prefix" location="/usr/local"/>
   <property name="javadoc_linkurl" value="http://java.sun.com/javase/ja/6/docs/ja/api/"/>
-  <property name="javac_options" value="-encoding EUC-JP -Xlint:unchecked -Xlint:deprecation -g"/>
+  <property name="javac_options" value="-encoding EUC-JP -Xlint:unchecked -Xlint:deprecation"/>
 
   <target name="all" depends="uncover.jar"/>
 
@@ -12,7 +12,7 @@
 
   <target name="compile" depends="destdir">
     <depend srcdir="src" destdir="classes" cache="depcache" closure="true"/>
-    <javac srcdir="src" destdir="classes">
+    <javac srcdir="src" destdir="classes" debug="true">
       <compilerarg line="${javac_options}"/>
     </javac>
   </target>

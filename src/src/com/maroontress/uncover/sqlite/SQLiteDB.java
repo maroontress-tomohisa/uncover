@@ -1,10 +1,14 @@
 package com.maroontress.uncover.sqlite;
 
+import com.maroontress.uncover.Arc;
+import com.maroontress.uncover.Block;
 import com.maroontress.uncover.Build;
 import com.maroontress.uncover.CommitSource;
 import com.maroontress.uncover.DB;
 import com.maroontress.uncover.DBException;
 import com.maroontress.uncover.Function;
+import com.maroontress.uncover.Graph;
+import com.maroontress.uncover.GraphSource;
 import com.maroontress.uncover.Revision;
 import com.maroontress.uncover.Toolkit;
 import java.sql.Connection;
@@ -261,19 +265,17 @@ public final class SQLiteDB implements DB {
     */
     private List<Function> getFunctions(final String buildID)
 	throws SQLException {
-	String format = String.format(
-	    // FieldArray.concatNames(ResultSetFunctionSource.class, ",")
-	    // を使う
-	    "SELECT name, sourceFile, lineNumber,  gcnoFile, checkSum,"
-	    + " complexity, executedBlocks, allBlocks, executedArcs, allArcs"
-	    + " FROM %s g"
+	String template = String.format(
+	    "SELECT %s FROM %s g"
 	    + " INNER JOIN %s f ON f.id = g.functionID"
 	    + " INNER JOIN %s gs ON g.id = gs.graphID"
 	    + " WHERE g.buildID = ?;",
+	    FieldArray.concatNames(ResultSetFunctionSource.class, ","),
 	    Table.GRAPH, Table.FUNCTION, Table.GRAPH_SUMMARY);
-	PreparedStatement s = con.prepareStatement(format);
+	PreparedStatement s = con.prepareStatement(template);
 	setParameter(s, new Object[] {buildID});
 	ResultSet rs = s.executeQuery();
+
 	List<Function> list = new ArrayList<Function>();
 	Toolkit toolkit = Toolkit.getInstance();
 	ResultSetFunctionSource source = new ResultSetFunctionSource();
@@ -375,9 +377,9 @@ public final class SQLiteDB implements DB {
     */
     private void removeBuild(final String id,
 			     final String projectID) throws SQLException {
-	String format = String.format(
+	String template = String.format(
 	    "DELETE FROM %s WHERE id = ? and projectID = ?;", Table.BUILD);
-	PreparedStatement s = con.prepareStatement(format);
+	PreparedStatement s = con.prepareStatement(template);
 	setParameter(s, new Object[] {id, projectID});
 	s.execute();
 	removeUnreferencedRows();
@@ -410,10 +412,10 @@ public final class SQLiteDB implements DB {
     */
     private void removeBuilds(final String revision,
 			      final String projectID) throws SQLException {
-	String format = String.format(
+	String template = String.format(
 	    "DELETE FROM %s WHERE revision = ? and projectID = ?;",
 	    Table.BUILD);
-	PreparedStatement s = con.prepareStatement(format);
+	PreparedStatement s = con.prepareStatement(template);
 	setParameter(s, new Object[] {revision, projectID});
 	s.execute();
 	removeUnreferencedRows();
@@ -445,16 +447,17 @@ public final class SQLiteDB implements DB {
     */
     private void removeProject(final String projectID) throws SQLException {
 	PreparedStatement s;
-	String format;
+	String template;
 
-	format = String.format("DELETE FROM %s WHERE id = ?;", Table.PROJECT);
-	s = con.prepareStatement(format);
+	template = String.format("DELETE FROM %s WHERE id = ?;",
+				 Table.PROJECT);
+	s = con.prepareStatement(template);
 	setParameter(s, new Object[] {projectID});
 	s.execute();
 
-	format = String.format("DELETE FROM %s WHERE projectID = ?;",
-			       Table.BUILD);
-	s = con.prepareStatement(format);
+	template = String.format("DELETE FROM %s WHERE projectID = ?;",
+				 Table.BUILD);
+	s = con.prepareStatement(template);
 	setParameter(s, new Object[] {projectID});
 	s.execute();
 
@@ -475,6 +478,128 @@ public final class SQLiteDB implements DB {
 	    rollback();
 	    throw new DBException("failed to delete project: "
 				  + e.getMessage(), e);
+	}
+    }
+
+    /**
+       指定したビルドと関数の、ブロックのリストを取得します。
+
+       @param functionID 関数ID
+       @param buildID ビルドID
+       @return ブロックのリスト
+       @throws SQLException エラーが発生したときにスローします。
+    */
+    private List<Block> getBlocks(final String functionID,
+				  final String buildID) throws SQLException {
+	String template = String.format(
+	    "SELECT %s FROM %s gb"
+	    + " INNER JOIN %s g ON g.id = gb.graphID"
+	    + " WHERE g.functionID = ? and g.buildID = ?;",
+	    FieldArray.concatNames(ResultSetBlockSource.class, ","),
+	    Table.GRAPH_BLOCK, Table.GRAPH);
+	PreparedStatement s = con.prepareStatement(template);
+	setParameter(s, new Object[] {functionID, buildID});
+	ResultSet rs = s.executeQuery();
+
+	List<Block> list = new ArrayList<Block>();
+	Toolkit toolkit = Toolkit.getInstance();
+	ResultSetBlockSource source = new ResultSetBlockSource();
+	while (rs.next()) {
+	    source.setResultSet(rs);
+	    Block block = toolkit.createBlock(source);
+	    list.add(block);
+	}
+	return list;
+    }
+
+    /**
+       指定したビルドと関数の、アークのリストを取得します。
+
+       @param functionID 関数ID
+       @param buildID ビルドID
+       @return アークのリスト
+       @throws SQLException エラーが発生したときにスローします。
+    */
+    private List<Arc> getArcs(final String functionID,
+			      final String buildID) throws SQLException {
+	// getFunctions, getBlocksとまとめる...
+	String template = String.format(
+	    "SELECT %s FROM %s ga"
+	    + " INNER JOIN %s g ON g.id = ga.graphID"
+	    + " WHERE g.functionID = ? and g.buildID = ?;",
+	    FieldArray.concatNames(ResultSetArcSource.class, ","),
+	    Table.GRAPH_ARC, Table.GRAPH);
+	PreparedStatement s = con.prepareStatement(template);
+	setParameter(s, new Object[] {functionID, buildID});
+	ResultSet rs = s.executeQuery();
+
+	List<Arc> list = new ArrayList<Arc>();
+	Toolkit toolkit = Toolkit.getInstance();
+	ResultSetArcSource source = new ResultSetArcSource();
+	while (rs.next()) {
+	    source.setResultSet(rs);
+	    Arc arc = toolkit.createArc(source);
+	    list.add(arc);
+	}
+	return list;
+    }
+
+    /** {@inheritDoc} */
+    public Graph getGraph(final String projectName, final String buildID,
+			  final String function,
+			  final String gcnoFile) throws DBException {
+	try {
+	    ProjectDeal projectDeal = new ProjectDeal(con);
+	    String projectID = projectDeal.queryID(projectName);
+	    if (projectID == null) {
+		throw new DBException("project not found: " + projectName);
+	    }
+
+	    Fetcher<FunctionRow> functionRowFetcher;
+	    functionRowFetcher = new QuerierFactory<FunctionRow>(
+		con, Table.FUNCTION, FunctionRow.class).createFetcher("id");
+	    functionRowFetcher.setRow(new FunctionRow());
+	    functionRowFetcher.getRow().set(function, gcnoFile, projectID);
+
+	    // CommitDeal.run()とまとめる
+            ResultSet rs = functionRowFetcher.executeQuery();
+            String functionID = null;
+            int k;
+            for (k = 0; rs.next(); ++k) {
+                functionID = rs.getString("id");
+            }
+            if (k > 1) {
+                String s = String.format(
+                    "projectID: %s; function %s (%s) found more than one.",
+                    projectID, function, gcnoFile);
+                throw new TableInconsistencyException(s);
+            }
+            if (functionID == null) {
+                String s = String.format(
+                    "projectID: %s; function %s (%s) not found.",
+                    projectID, function, gcnoFile);
+                throw new DBException(s);
+            }
+
+	    final List<Block> blocks = getBlocks(functionID, buildID);
+	    final List<Arc> arcs = getArcs(functionID, buildID);
+	    Toolkit toolkit = Toolkit.getInstance();
+	    return toolkit.createGraph(new GraphSource() {
+		public String getName() {
+		    return function;
+		}
+		public String getGCNOFile() {
+		    return gcnoFile;
+		}
+		public Block[] getAllBlocks() {
+		    return blocks.toArray(new Block[blocks.size()]);
+		}
+		public Arc[] getAllArcs() {
+		    return arcs.toArray(new Arc[arcs.size()]);
+		}
+	    });
+	} catch (SQLException e) {
+	    throw new DBException("failed to get graph: " + e.getMessage(), e);
 	}
     }
 }

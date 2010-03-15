@@ -108,4 +108,18 @@ public interface DB {
        きにスローします。
     */
     void deleteProject(String projectName) throws DBException;
+
+    /**
+       グラフを取得します。
+
+       @param projectName プロジェクト名
+       @param buildID ビルドID
+       @param function 関数名
+       @param gcnoFile GCNOファイル名
+       @return グラフ
+       @throws DBException データベース操作に関するエラーが発生したと
+       きにスローします。
+    */
+    Graph getGraph(String projectName, String buildID, String function,
+		   String gcnoFile) throws DBException;
 }

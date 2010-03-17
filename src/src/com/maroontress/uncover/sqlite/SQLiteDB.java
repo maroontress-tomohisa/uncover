@@ -346,6 +346,7 @@ public final class SQLiteDB implements DB {
        @throws SQLException エラーが発生したときにスローします。
     */
     private void removeUnreferencedRows() throws SQLException {
+	// すべて、ひとつのループでまとめる
 	Statement s = con.createStatement();
 	String sql;
 
@@ -355,15 +356,20 @@ public final class SQLiteDB implements DB {
 	    Table.GRAPH, Table.BUILD, Table.GRAPH);
 	s.executeUpdate(sql);
 
-	sql = String.format(
-	    "DELETE FROM %s WHERE NOT EXISTS ("
-	    + "SELECT * FROM %s g WHERE g.id = %s.graphID);",
-	    Table.GRAPH_SUMMARY, Table.GRAPH, Table.GRAPH_SUMMARY);
-	s.executeUpdate(sql);
+	String[] tableNames = {Table.GRAPH_SUMMARY,
+			       Table.GRAPH_BLOCK,
+			       Table.GRAPH_ARC};
+	for (String name : tableNames) {
+	    sql = String.format(
+		"DELETE FROM %s WHERE NOT EXISTS ("
+		+ "SELECT * FROM %s g WHERE g.id = %s.graphID);",
+		name, Table.GRAPH, name);
+	    s.executeUpdate(sql);
+	}
 
 	sql = String.format(
-	    "DELETE FROM %s WHERE NOT EXISTS"
-	    + " (SELECT * FROM %s g WHERE g.functionID = %s.id);",
+	    "DELETE FROM %s WHERE NOT EXISTS ("
+	    + "SELECT * FROM %s g WHERE g.functionID = %s.id);",
 	    Table.FUNCTION, Table.GRAPH, Table.FUNCTION);
 	s.executeUpdate(sql);
     }

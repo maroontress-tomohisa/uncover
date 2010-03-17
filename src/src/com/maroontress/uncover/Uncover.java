@@ -4,6 +4,7 @@ import com.maroontress.cui.OptionListener;
 import com.maroontress.cui.Options;
 import com.maroontress.cui.OptionsParsingException;
 import java.io.InputStream;
+import java.io.PrintStream;
 import java.util.Arrays;
 
 /**
@@ -98,20 +99,29 @@ public final class Uncover {
     }
 
     /**
+       使用方法を表示します。
+
+       @param out 出力ストリーム
+    */
+    private void printUsage(final PrintStream out) {
+        out.printf("Usage: uncover [Options] Command [Arguments]%n"
+		   + "Options are:%n");
+	String[] help = options.getHelpMessage(INDENT_WIDTH).split("\n");
+	for (String s : help) {
+	    out.printf("  %s%n", s);
+	}
+	out.printf("Commands are:%n");
+	String[] commands = bank.getHelpMessage(INDENT_WIDTH).split("\n");
+	for (String s : commands) {
+	    out.printf("  %s%n", s);
+	}
+    }
+
+    /**
        使用方法を表示して終了します。
     */
     private void usage() {
-        System.err.print("Usage: uncover [Options] Command [Arguments]\n"
-			 + "Options are:\n");
-	String[] help = options.getHelpMessage(INDENT_WIDTH).split("\n");
-	for (String s : help) {
-	    System.err.printf("  %s\n", s);
-	}
-	System.err.print("Commands are:\n");
-	String[] commands = bank.getHelpMessage(INDENT_WIDTH).split("\n");
-	for (String s : commands) {
-	    System.err.printf("  %s\n", s);
-	}
+	printUsage(System.err);
         System.exit(1);
     }
 

@@ -80,7 +80,7 @@ public final class ReportCommand extends Command {
 	Build[] builds = db.getBuilds(projectName, rev);
 	if (builds.length > 1) {
 	    String howToFix = String.format(
-		"please specify the ID instead of '%s'.\n", rev);
+		"please specify the ID instead of '%s'.%n", rev);
 	    throw new MultipleBuildsException(rev, builds, howToFix);
 	}
 	return builds[0];
@@ -95,7 +95,7 @@ public final class ReportCommand extends Command {
 	    Build newBuild = getBuild(db, projectName, newRevision);
 	    if (!oldBuild.getPlatform().equals(newBuild.getPlatform())) {
 		System.err.printf(
-		    "warning: the platforms of '%s' and '%s' are different.\n",
+		    "warning: the platforms of '%s' and '%s' are different.%n",
 		    oldRevision, newRevision);
 	    }
 	    RevisionPair pair

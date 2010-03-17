@@ -36,13 +36,13 @@ public class MultipleBuildsException extends Exception {
        @param out 出力ストリーム
     */
     public final void printDescription(final PrintStream out) {
-	out.printf("revision '%s' has %d results:\n\n",
+	out.printf("revision '%s' has %d results:%n%n",
 		   revision, builds.length);
 	for (Build b : builds) {
-	    out.printf("ID: @%s\n"
-		       + "Platform: %s\n"
-		       + "Timestamp: %s\n"
-		       + "\n",
+	    out.printf("ID: @%s%n"
+		       + "Platform: %s%n"
+		       + "Timestamp: %s%n"
+		       + "%n",
 		       b.getID(), b.getPlatform(), b.getTimestamp());
 	}
 	out.printf(howToFix);

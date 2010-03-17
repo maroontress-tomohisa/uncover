@@ -3,6 +3,7 @@ package com.maroontress.uncover;
 import com.maroontress.cui.OptionListener;
 import com.maroontress.cui.Options;
 import com.maroontress.cui.OptionsParsingException;
+import java.io.PrintStream;
 
 /**
    コマンドです。
@@ -136,39 +137,38 @@ public abstract class Command {
     }
 
     /**
-       使用方法を表示して終了します。
+       使用方法を表示します。
+
+       @param out 出力ストリーム
     */
-    protected final void usage() {
-	System.err.printf(getUsage());
-        System.exit(1);
+    private void printUsage(final PrintStream out) {
+	try {
+	    String name = (String) getClass().getField("NAME").get(null);
+	    String args = (String) getClass().getField("ARGS").get(null);
+	    String desc = (String) getClass().getField("DESC").get(null);
+
+	    out.printf("Usage: uncover %s [Options] %s%n"
+		       + "Options are:%n",
+		       name, args);
+	    String[] help = options.getHelpMessage(INDENT_WIDTH).split("\n");
+	    for (String s : help) {
+		out.printf("  %s%n", s);
+	    }
+	    out.printf("Description:%n"
+		       + "  %s%n",
+		       desc);
+	} catch (NoSuchFieldException e) {
+	    e.printStackTrace();
+	} catch (IllegalAccessException e) {
+	    e.printStackTrace();
+	}
     }
 
     /**
-       使用方法を取得します。
-
-       @return 使用方法
+       使用方法を表示して終了します。
     */
-    private String getUsage() {
-	String name;
-	String args;
-	String desc;
-	try {
-	    name = (String) getClass().getField("NAME").get(null);
-	    args = (String) getClass().getField("ARGS").get(null);
-	    desc = (String) getClass().getField("DESC").get(null);
-	} catch (NoSuchFieldException e) {
-	    return null;
-	} catch (IllegalAccessException e) {
-	    return null;
-	}
-
-        String m = String.format("Usage: uncover %s [Options] %s\n"
-				 + "Options are:\n", name, args);
-	String[] help = options.getHelpMessage(INDENT_WIDTH).split("\n");
-	for (String s : help) {
-	    m += String.format("  %s\n", s);
-	}
-	m += "Description:\n  " + desc + "\n";
-        return m;
+    protected final void usage() {
+	printUsage(System.err);
+        System.exit(1);
     }
 }

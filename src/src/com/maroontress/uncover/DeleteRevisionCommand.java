@@ -87,7 +87,7 @@ public final class DeleteRevisionCommand extends Command {
 	if (builds.length > 1) {
 	    String howToFix = String.format(
 		"please specify the ID instead of '%s',"
-		+ " or add '--all' option.\n", rev);
+		+ " or add '--all' option.%n", rev);
 	    throw new MultipleBuildsException(rev, builds, howToFix);
 	}
 	return builds[0];

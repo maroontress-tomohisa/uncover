@@ -27,6 +27,9 @@ public final class InitDeal {
     */
     public void run() throws SQLException {
 	Statement s = con.createStatement();
+	s.executeUpdate("CREATE TABLE " + Table.CONFIG + " ("
+			+ FieldArray.concatNames(ConfigRow.class, ", ")
+			+ ");");
 	s.executeUpdate("CREATE TABLE " + Table.PROJECT + " ("
 			+ "id INTEGER PRIMARY KEY, "
 			+ FieldArray.concatNames(ProjectRow.class, ", ")
@@ -52,5 +55,11 @@ public final class InitDeal {
 	s.executeUpdate("CREATE TABLE " + Table.GRAPH_ARC + " ("
 			+ FieldArray.concatNames(GraphArcRow.class, ", ")
 			+ ");");
+
+	Adder<ConfigRow> adder = new QuerierFactory<ConfigRow>(
+	    con, Table.CONFIG, ConfigRow.class).createAdder();
+	adder.setRow(new ConfigRow());
+	adder.getRow().set(SQLiteDB.VERSION);
+	adder.execute();
     }
 }

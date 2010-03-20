@@ -24,6 +24,9 @@ import java.util.List;
    SQLiteを使用したデータベースの実装です。
 */
 public final class SQLiteDB implements DB {
+    /** データベースのバージョンです。 */
+    public static final String VERSION = "1";
+
     /** JDBCのURLです。 */
     private static final String URL = "jdbc:sqlite:";
 
@@ -99,8 +102,40 @@ public final class SQLiteDB implements DB {
 	}
     }
 
+    /**
+       データベースの設定を確認します。
+
+       今のところバージョンの一致だけを確認します。
+
+       @throws DBException DBのバージョンが不一致のときにスローします。
+    */
+    private void verifyIntegrity() throws DBException {
+	String version = null;
+	try {
+	    String sql = String.format("SELECT * FROM %s;", Table.CONFIG);
+	    PreparedStatement s = con.prepareStatement(sql);
+	    ResultSet rs = s.executeQuery();
+	    int k;
+
+	    for (k = 0; rs.next(); ++k) {
+		version = rs.getString("version");
+	    }
+	    if (k > 1) {
+		String m = String.format("config found more than one.");
+		throw new TableInconsistencyException(m);
+	    }
+	} catch (SQLException e) {
+	    throw new DBException("can't get DB version: "
+				  + e.getMessage(), e);
+	}
+	if (version == null || !version.equals(VERSION)) {
+	    throw new DBException("DB version mismatched: " + version);
+	}
+    }
+
     /** {@inheritDoc} */
     public void commit(final CommitSource source) throws DBException {
+	verifyIntegrity();
 	try {
 	    new CommitDeal(con, source).run();
 	    con.commit();
@@ -130,6 +165,7 @@ public final class SQLiteDB implements DB {
 
     /** {@inheritDoc} */
     public String[] getProjectNames() throws DBException {
+	verifyIntegrity();
 	try {
 	    return queryProjectNames();
 	} catch (SQLException e) {
@@ -192,6 +228,7 @@ public final class SQLiteDB implements DB {
     /** {@inheritDoc} */
     public Build[] getBuilds(final String projectName,
 			     final String revision) throws DBException {
+	verifyIntegrity();
 	try {
 	    ProjectDeal projectDeal = new ProjectDeal(con);
 	    String projectID = projectDeal.queryID(projectName);
@@ -237,6 +274,7 @@ public final class SQLiteDB implements DB {
     /** {@inheritDoc} */
     public Build getBuild(final String projectName,
 			  final String id) throws DBException {
+	verifyIntegrity();
 	try {
 	    ProjectDeal projectDeal = new ProjectDeal(con);
 	    String projectID = projectDeal.queryID(projectName);
@@ -289,6 +327,7 @@ public final class SQLiteDB implements DB {
 
     /** {@inheritDoc} */
     public Revision getRevision(final String id) throws DBException {
+	verifyIntegrity();
 	try {
 	    return new Revision(getFunctions(id));
 	} catch (SQLException e) {
@@ -326,6 +365,7 @@ public final class SQLiteDB implements DB {
     /** {@inheritDoc} */
     public String[] getRevisionNames(final String projectName)
 	throws DBException {
+	verifyIntegrity();
 	try {
 	    ProjectDeal projectDeal = new ProjectDeal(con);
 	    String projectID = projectDeal.queryID(projectName);
@@ -394,6 +434,7 @@ public final class SQLiteDB implements DB {
     /** {@inheritDoc} */
     public void deleteBuild(final String projectName,
 			    final String id) throws DBException {
+	verifyIntegrity();
 	try {
 	    ProjectDeal projectDeal = new ProjectDeal(con);
 	    String projectID = projectDeal.queryID(projectName);
@@ -430,6 +471,7 @@ public final class SQLiteDB implements DB {
     /** {@inheritDoc} */
     public void deleteBuilds(final String projectName,
 			     final String revision) throws DBException {
+	verifyIntegrity();
 	try {
 	    ProjectDeal projectDeal = new ProjectDeal(con);
 	    String projectID = projectDeal.queryID(projectName);
@@ -472,6 +514,7 @@ public final class SQLiteDB implements DB {
 
     /** {@inheritDoc} */
     public void deleteProject(final String projectName) throws DBException {
+	verifyIntegrity();
 	try {
 	    ProjectDeal projectDeal = new ProjectDeal(con);
 	    String projectID = projectDeal.queryID(projectName);
@@ -554,6 +597,7 @@ public final class SQLiteDB implements DB {
     public Graph getGraph(final String projectName, final String buildID,
 			  final String function,
 			  final String gcnoFile) throws DBException {
+	verifyIntegrity();
 	try {
 	    ProjectDeal projectDeal = new ProjectDeal(con);
 	    String projectID = projectDeal.queryID(projectName);

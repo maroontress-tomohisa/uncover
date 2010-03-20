@@ -7,6 +7,9 @@ public final class Table {
     /** テーブルのプレフィックスです。 */
     public static final String PREFIX = "com_maroontress_uncover_";
 
+    /** 設定のテーブル名です。 */
+    public static final String CONFIG = PREFIX + "config";
+
     /** プロジェクトのテーブル名です。 */
     public static final String PROJECT = PREFIX + "project";
 

@@ -171,4 +171,32 @@ public abstract class Command {
 	printUsage(System.err);
         System.exit(1);
     }
+
+    /**
+       プロジェクト名とリビジョン、またはビルドIDを指定して、ビルドを
+       取得します。
+
+       @param db データベース
+       @param projectName プロジェクト名
+       @param rev リビジョン、またはビルドID
+       @param howToFix 指定したリビジョンに複数のビルドが存在するとき、
+       どのようにすればビルドを特定できるかを説明する文字列
+       @return ビルド
+       @throws DBException データベース操作に関するエラーが発生したと
+       きにスローします。
+       @throws MultipleBuildsException 指定したリビジョンに複数のビル
+       ドが存在するときにスローします。
+    */
+    protected static Build getBuild(final DB db, final String projectName,
+				    final String rev, final String howToFix)
+        throws DBException, MultipleBuildsException {
+        if (rev.startsWith("@")) {
+            return db.getBuild(projectName, rev.substring(1));
+        }
+        Build[] builds = db.getBuilds(projectName, rev);
+        if (builds.length > 1) {
+            throw new MultipleBuildsException(rev, builds, howToFix);
+        }
+        return builds[0];
+    }
 }

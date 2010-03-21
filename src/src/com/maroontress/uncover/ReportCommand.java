@@ -71,19 +71,12 @@ public final class ReportCommand extends Command {
        @throws MultipleBuildsException 指定したリビジョンに複数のビル
        ドが存在するときにスローします。
     */
-    private Build getBuild(final DB db, final String projectName,
-			   final String rev)
-	throws DBException, MultipleBuildsException {
-	if (rev.startsWith("@")) {
-	    return db.getBuild(projectName, rev.substring(1));
-	}
-	Build[] builds = db.getBuilds(projectName, rev);
-	if (builds.length > 1) {
-	    String howToFix = String.format(
-		"please specify the ID instead of '%s'.%n", rev);
-	    throw new MultipleBuildsException(rev, builds, howToFix);
-	}
-	return builds[0];
+    private static Build getBuild(final DB db, final String projectName,
+				  final String rev)
+        throws DBException, MultipleBuildsException {
+	String howToFix = String.format(
+	    "please specify the ID instead of '%s'.%n", rev);
+	return getBuild(db, projectName, rev, howToFix);
     }
 
     /**

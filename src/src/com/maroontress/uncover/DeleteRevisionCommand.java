@@ -64,36 +64,6 @@ public final class DeleteRevisionCommand extends Command {
     }
 
     /**
-       プロジェクト名とリビジョン、またはビルドIDを指定して、ビルドを
-       取得します。
-
-       @param db データベース
-       @param projectName プロジェクト名
-       @param rev リビジョン、またはビルドID
-       @return ビルド
-       @throws DBException データベース操作に関するエラーが発生したと
-       きにスローします。
-       @throws MultipleBuildsException 指定したリビジョンに複数のビル
-       ドが存在するときにスローします。
-    */
-    private Build getBuild(final DB db, final String projectName,
-			   final String rev)
-	throws DBException, MultipleBuildsException {
-	// ReportCommand.getBuild()とまとめる
-	if (rev.startsWith("@")) {
-	    return db.getBuild(projectName, rev.substring(1));
-	}
-	Build[] builds = db.getBuilds(projectName, rev);
-	if (builds.length > 1) {
-	    String howToFix = String.format(
-		"please specify the ID instead of '%s',"
-		+ " or add '--all' option.%n", rev);
-	    throw new MultipleBuildsException(rev, builds, howToFix);
-	}
-	return builds[0];
-    }
-
-    /**
        {@inheritDoc}
     */
     protected void run(final DB db) throws CommandException {
@@ -101,7 +71,10 @@ public final class DeleteRevisionCommand extends Command {
 	    if (isAll) {
 		db.deleteBuilds(projectName, revision);
 	    } else {
-		Build build = getBuild(db, projectName, revision);
+		String howToFix = String.format(
+		    "please specify the ID instead of '%s',"
+		    + " or add '--all' option.%n", revision);
+		Build build = getBuild(db, projectName, revision, howToFix);
 		db.deleteBuild(projectName, build.getID());
 	    }
 	} catch (MultipleBuildsException e) {

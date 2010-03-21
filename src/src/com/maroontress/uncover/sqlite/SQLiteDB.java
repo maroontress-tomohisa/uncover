@@ -16,7 +16,6 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -181,8 +180,10 @@ public final class SQLiteDB implements DB {
        @param values パラメータの値の配列
        @throws SQLException エラーが発生したときにスローします。
     */
-    private void setParameter(final PreparedStatement s, final Object[] values)
+    private static void setParameter(final PreparedStatement s,
+				     final Object[] values)
 	throws SQLException {
+	// ListCreator.setParameter()とまとめる
 	int k = 0;
 	for (Object v : values) {
 	    ++k;
@@ -198,31 +199,47 @@ public final class SQLiteDB implements DB {
     }
 
     /**
-       ビルドの配列を取得します。
+       ビルドのリストを取得します。
+
+       @param template クエリ文字列
+       @param params クエリのパラメータ
+       @return ビルドのリスト
+       @throws SQLException エラーが発生したときにスローします。
+    */
+    private List<Build> getBuildList(final String template,
+				     final Object[] params)
+	throws SQLException {
+	ListCreator<Build> creator = new ListCreator<Build>(con) {
+	    private ResultSetBuildSource source = new ResultSetBuildSource();
+	    public Row getRow() {
+		return source;
+	    }
+	    public Build create(final Toolkit toolkit) {
+		return toolkit.createBuild(source);
+	    }
+	};
+	return creator.getList(template, params);
+    }
+
+    /**
+       ビルドのリストを取得します。
 
        指定したリビジョンとプロジェクトIDにマッチするビルドの配列を返
        します。
 
        @param revision リビジョン
        @param projectID プロジェクトID
-       @return ビルドの配列
+       @return ビルドのリスト
        @throws SQLException エラーが発生したときにスローします。
     */
-    private Build[] queryBuilds(final String revision, final String projectID)
+    private List<Build> queryBuilds(final String revision,
+				    final String projectID)
 	throws SQLException {
-	PreparedStatement s = con.prepareStatement(
-	    "SELECT * FROM " + Table.BUILD
-	    + " WHERE revision = ? and projectID = ?;");
-	setParameter(s, new Object[] {revision, projectID});
-	ResultSet rs = s.executeQuery();
-	ArrayList<Build> list = new ArrayList<Build>();
-	Toolkit tk = Toolkit.getInstance();
-	ResultSetBuildSource source = new ResultSetBuildSource();
-	while (rs.next()) {
-	    source.setResultSet(rs);
-	    list.add(tk.createBuild(source));
-	}
-	return list.toArray(new Build[list.size()]);
+	String template = String.format(
+	    "SELECT * FROM %s WHERE revision = ? and projectID = ?;",
+	    Table.BUILD);
+	Object[] params = new Object[] {revision, projectID};
+	return getBuildList(template, params);
     }
 
     /** {@inheritDoc} */
@@ -235,11 +252,11 @@ public final class SQLiteDB implements DB {
 	    if (projectID == null) {
 		throw new DBException("project not found: " + projectName);
 	    }
-	    Build[] builds = queryBuilds(revision, projectID);
-	    if (builds.length == 0) {
+	    List<Build> list = queryBuilds(revision, projectID);
+	    if (list.size() == 0) {
 		throw new DBException("revision not found: " + revision);
 	    }
-	    return builds;
+	    return list.toArray(new Build[list.size()]);
 	} catch (SQLException e) {
 	    throw new DBException("failed to get builds: "
 				  + e.getMessage(), e);
@@ -251,24 +268,16 @@ public final class SQLiteDB implements DB {
 
        @param id ビルドID
        @param projectID プロジェクトID
-       @return ビルドの配列
+       @return ビルドのリスト
        @throws SQLException エラーが発生したときにスローします。
     */
-    private Build[] queryBuild(final String id,
-			     final String projectID) throws SQLException {
-	PreparedStatement s = con.prepareStatement(
-	    "SELECT * FROM " + Table.BUILD
-	    + " WHERE id = ? and projectID = ?;");
-	setParameter(s, new Object[] {id, projectID});
-	ResultSet rs = s.executeQuery();
-	ArrayList<Build> list = new ArrayList<Build>();
-	Toolkit tk = Toolkit.getInstance();
-	ResultSetBuildSource source = new ResultSetBuildSource();
-	while (rs.next()) {
-	    source.setResultSet(rs);
-	    list.add(tk.createBuild(source));
-	}
-	return list.toArray(new Build[list.size()]);
+    private List<Build> queryBuild(final String id, final String projectID)
+	throws SQLException {
+	String template = String.format(
+	    "SELECT * FROM %s WHERE id = ? and projectID = ?;",
+	    Table.BUILD);
+	Object[] params = new Object[] {id, projectID};
+	return getBuildList(template, params);
     }
 
     /** {@inheritDoc} */
@@ -281,14 +290,14 @@ public final class SQLiteDB implements DB {
 	    if (projectID == null) {
 		throw new DBException("project not found: " + projectName);
 	    }
-	    Build[] builds = queryBuild(id, projectID);
-	    if (builds.length == 0) {
+	    List<Build> list = queryBuild(id, projectID);
+	    if (list.size() == 0) {
 		throw new DBException("not found: @" + id);
 	    }
-	    if (builds.length > 1) {
+	    if (list.size() > 1) {
 		throw new DBException("internal error");
 	    }
-	    return builds[0];
+	    return list.get(0);
 	} catch (SQLException e) {
 	    throw new DBException("failed to get build: " + e.getMessage(), e);
 	}
@@ -310,19 +319,19 @@ public final class SQLiteDB implements DB {
 	    + " WHERE g.buildID = ?;",
 	    FieldArray.concatNames(ResultSetFunctionSource.class, ","),
 	    Table.GRAPH, Table.FUNCTION, Table.GRAPH_SUMMARY);
-	PreparedStatement s = con.prepareStatement(template);
-	setParameter(s, new Object[] {buildID});
-	ResultSet rs = s.executeQuery();
+	Object[] params = new Object[] {buildID};
 
-	List<Function> list = new ArrayList<Function>();
-	Toolkit toolkit = Toolkit.getInstance();
-	ResultSetFunctionSource source = new ResultSetFunctionSource();
-	while (rs.next()) {
-	    source.setResultSet(rs);
-	    Function function = toolkit.createFunction(source);
-	    list.add(function);
-	}
-	return list;
+	ListCreator<Function> creator = new ListCreator<Function>(con) {
+	    private ResultSetFunctionSource source
+	        = new ResultSetFunctionSource();
+	    public Row getRow() {
+		return source;
+	    }
+	    public Function create(final Toolkit toolkit) {
+		return toolkit.createFunction(source);
+	    }
+	};
+	return creator.getList(template, params);
     }
 
     /** {@inheritDoc} */
@@ -337,29 +346,31 @@ public final class SQLiteDB implements DB {
     }
 
     /**
-       リビジョン名の配列を取得します。
+       リビジョン名のリストを取得します。
 
-       指定したプロジェクトIDにマッチするリビジョン名の配列を返します。
+       指定したプロジェクトIDにマッチするリビジョン名のリストを返します。
 
        @param projectID プロジェクトID
-       @return ビルドの配列
+       @return リビジョン名のリスト
        @throws SQLException エラーが発生したときにスローします。
     */
-    private String[] queryRevisionNames(final String projectID)
+    private List<String> queryRevisionNames(final String projectID)
 	throws SQLException {
-	PreparedStatement s = con.prepareStatement(
-	    "SELECT * FROM " + Table.BUILD
-	    + " WHERE projectID = ?;");
-	setParameter(s, new Object[] {projectID});
-	ResultSet rs = s.executeQuery();
-	ArrayList<String> list = new ArrayList<String>();
-	Toolkit tk = Toolkit.getInstance();
-	ResultSetBuildSource source = new ResultSetBuildSource();
-	while (rs.next()) {
-	    source.setResultSet(rs);
-	    list.add(tk.createBuild(source).getRevision());
-	}
-	return list.toArray(new String[list.size()]);
+	String template = String.format(
+	    "SELECT * FROM %s WHERE projectID = ?;",
+	    Table.BUILD);
+	Object[] params = new Object[] {projectID};
+
+	ListCreator<String> creator = new ListCreator<String>(con) {
+	    private ResultSetBuildSource source = new ResultSetBuildSource();
+	    public Row getRow() {
+		return source;
+	    }
+	    public String create(final Toolkit toolkit) {
+		return toolkit.createBuild(source).getRevision();
+	    }
+	};
+	return creator.getList(template, params);
     }
 
     /** {@inheritDoc} */
@@ -372,11 +383,37 @@ public final class SQLiteDB implements DB {
 	    if (projectID == null) {
 		throw new DBException("project not found: " + projectName);
 	    }
-	    return queryRevisionNames(projectID);
+	    List<String> list = queryRevisionNames(projectID);
+	    return list.toArray(new String[list.size()]);
 	} catch (SQLException e) {
 	    throw new DBException("failed to get revision names: "
 				  + e.getMessage(), e);
 	}
+    }
+
+    /**
+       テーブルの列で別のテーブルの行を参照するものの中で、参照先が存
+       在しない列をもつ行をすべて削除します。
+
+       table.columnがrefTable.refColumnを参照していて、その参照先とな
+       るrefTable.refColumnが存在しない場合、参照元のtable.columnを削
+       除する、という操作をtableの各行に対して実行します。
+
+       @param table 参照するテーブルの名前
+       @param column tableの列の名前
+       @param refTable 参照されるテーブルの名前
+       @param refColumn refTableの列の名前
+       @throws SQLException エラーが発生したときにスローします。
+    */
+    private void removeUnreferencedRows(final String table,
+					final String column,
+					final String refTable,
+					final String refColumn)
+	throws SQLException {
+	String sql = String.format("DELETE FROM %s WHERE NOT EXISTS ("
+				   + "SELECT * FROM %s g WHERE g.%s = %s.%s);",
+				   table, refTable, refColumn, table, column);
+	con.createStatement().executeUpdate(sql);
     }
 
     /**
@@ -386,32 +423,16 @@ public final class SQLiteDB implements DB {
        @throws SQLException エラーが発生したときにスローします。
     */
     private void removeUnreferencedRows() throws SQLException {
-	// すべて、ひとつのループでまとめる
-	Statement s = con.createStatement();
-	String sql;
-
-	sql = String.format(
-	    "DELETE FROM %s WHERE NOT EXISTS ("
-	    + "SELECT * FROM %s b WHERE b.id = %s.buildID);",
-	    Table.GRAPH, Table.BUILD, Table.GRAPH);
-	s.executeUpdate(sql);
-
-	String[] tableNames = {Table.GRAPH_SUMMARY,
-			       Table.GRAPH_BLOCK,
-			       Table.GRAPH_ARC};
-	for (String name : tableNames) {
-	    sql = String.format(
-		"DELETE FROM %s WHERE NOT EXISTS ("
-		+ "SELECT * FROM %s g WHERE g.id = %s.graphID);",
-		name, Table.GRAPH, name);
-	    s.executeUpdate(sql);
-	}
-
-	sql = String.format(
-	    "DELETE FROM %s WHERE NOT EXISTS ("
-	    + "SELECT * FROM %s g WHERE g.functionID = %s.id);",
-	    Table.FUNCTION, Table.GRAPH, Table.FUNCTION);
-	s.executeUpdate(sql);
+	removeUnreferencedRows(Table.GRAPH, "buildID",
+			       Table.BUILD, "id");
+	removeUnreferencedRows(Table.GRAPH_SUMMARY, "graphID",
+			       Table.GRAPH, "id");
+	removeUnreferencedRows(Table.GRAPH_BLOCK, "graphID",
+			       Table.GRAPH, "id");
+	removeUnreferencedRows(Table.GRAPH_ARC, "graphID",
+			       Table.GRAPH, "id");
+	removeUnreferencedRows(Table.FUNCTION, "id",
+			       Table.GRAPH, "functionID");
     }
 
     /**
@@ -546,19 +567,18 @@ public final class SQLiteDB implements DB {
 	    + " WHERE g.functionID = ? and g.buildID = ?;",
 	    FieldArray.concatNames(ResultSetBlockSource.class, ","),
 	    Table.GRAPH_BLOCK, Table.GRAPH);
-	PreparedStatement s = con.prepareStatement(template);
-	setParameter(s, new Object[] {functionID, buildID});
-	ResultSet rs = s.executeQuery();
+	Object[] params = new Object[] {functionID, buildID};
 
-	List<Block> list = new ArrayList<Block>();
-	Toolkit toolkit = Toolkit.getInstance();
-	ResultSetBlockSource source = new ResultSetBlockSource();
-	while (rs.next()) {
-	    source.setResultSet(rs);
-	    Block block = toolkit.createBlock(source);
-	    list.add(block);
-	}
-	return list;
+	ListCreator<Block> creator = new ListCreator<Block>(con) {
+	    private ResultSetBlockSource source = new ResultSetBlockSource();
+	    public Row getRow() {
+		return source;
+	    }
+	    public Block create(final Toolkit toolkit) {
+		return toolkit.createBlock(source);
+	    }
+	};
+	return creator.getList(template, params);
     }
 
     /**
@@ -571,26 +591,24 @@ public final class SQLiteDB implements DB {
     */
     private List<Arc> getArcs(final String functionID,
 			      final String buildID) throws SQLException {
-	// getFunctions, getBlocksとまとめる...
 	String template = String.format(
 	    "SELECT %s FROM %s ga"
 	    + " INNER JOIN %s g ON g.id = ga.graphID"
 	    + " WHERE g.functionID = ? and g.buildID = ?;",
 	    FieldArray.concatNames(ResultSetArcSource.class, ","),
 	    Table.GRAPH_ARC, Table.GRAPH);
-	PreparedStatement s = con.prepareStatement(template);
-	setParameter(s, new Object[] {functionID, buildID});
-	ResultSet rs = s.executeQuery();
+	Object[] params = new Object[] {functionID, buildID};
 
-	List<Arc> list = new ArrayList<Arc>();
-	Toolkit toolkit = Toolkit.getInstance();
-	ResultSetArcSource source = new ResultSetArcSource();
-	while (rs.next()) {
-	    source.setResultSet(rs);
-	    Arc arc = toolkit.createArc(source);
-	    list.add(arc);
-	}
-	return list;
+	ListCreator<Arc> creator = new ListCreator<Arc>(con) {
+	    private ResultSetArcSource source = new ResultSetArcSource();
+	    public Row getRow() {
+		return source;
+	    }
+	    public Arc create(final Toolkit toolkit) {
+		return toolkit.createArc(source);
+	    }
+	};
+	return creator.getList(template, params);
     }
 
     /** {@inheritDoc} */

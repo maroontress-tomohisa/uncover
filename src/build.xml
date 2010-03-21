@@ -27,6 +27,21 @@
     <jar destfile="uncover.jar" manifest="manifest" basedir="classes"/>
   </target>
 
+  <target name="install" depends="uncover.jar">
+    <copy file="uncover.sh.in" tofile="uncover.sh" overwrite="true">
+      <filterset>
+        <filter token="PREFIX" value="${prefix}"/>
+      </filterset>
+    </copy>
+    <copy file="uncover.jar" todir="${prefix}/lib/uncover" overwrite="true"/>
+    <exec dir="." executable="install" failonerror="true">
+      <arg line="-d -m 0755 ${prefix}/bin"/>
+    </exec>
+    <exec dir="." executable="install" failonerror="true">
+      <arg line="-c -m 0755 uncover.sh ${prefix}/bin/uncover"/>
+    </exec>
+  </target>
+
   <target name="package-list">
     <exec dir="." executable="fetch" failonerror="false">
       <arg line="${javadoc_linkurl}/package-list"/>
@@ -50,8 +65,7 @@
 
   <target name="checkstyle">
     <cs:checkstyle config="sun_checks.xml">
-      <fileset dir="src" includes="com/maroontress/uncover/**/*.java"/>
-      <fileset dir="src" includes="com/maroontress/coverture/**/*.java"/>
+      <fileset dir="src" includes="**/*.java"/>
       <classpath path="classes"/>
       <formatter type="plain"/>
     </cs:checkstyle>

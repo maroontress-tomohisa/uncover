@@ -1,0 +1,8 @@
+#!/bin/sh
+
+JVM_OPTIONS="-Xmx256m"
+if [ "${UNCOVER_CLASSPATH}" != "" ] ; then
+    JVM_OPTIONS="${JVM_OPTIONS} -Djava.ext.dirs=${UNCOVER_CLASSPATH}"
+fi
+
+exec java ${JVM_OPTIONS} -jar @PREFIX@/lib/uncover/uncover.jar "$@"

@@ -623,31 +623,15 @@ public final class SQLiteDB implements DB {
 		throw new DBException("project not found: " + projectName);
 	    }
 
-	    Fetcher<FunctionRow> functionRowFetcher;
-	    functionRowFetcher = new QuerierFactory<FunctionRow>(
-		con, Table.FUNCTION, FunctionRow.class).createFetcher("id");
-	    functionRowFetcher.setRow(new FunctionRow());
-	    functionRowFetcher.getRow().set(function, gcnoFile, projectID);
-
-	    // CommitDeal.run()とまとめる
-            ResultSet rs = functionRowFetcher.executeQuery();
-            String functionID = null;
-            int k;
-            for (k = 0; rs.next(); ++k) {
-                functionID = rs.getString("id");
-            }
-            if (k > 1) {
-                String s = String.format(
-                    "projectID: %s; function %s (%s) found more than one.",
-                    projectID, function, gcnoFile);
-                throw new TableInconsistencyException(s);
-            }
-            if (functionID == null) {
-                String s = String.format(
-                    "projectID: %s; function %s (%s) not found.",
-                    projectID, function, gcnoFile);
-                throw new DBException(s);
-            }
+	    FunctionResolver functionResolver = new FunctionResolver(con);
+            String functionID = functionResolver.getFunctionID(
+		function, gcnoFile, projectID);
+	    if (functionID == null) {
+		String s = String.format(
+		    "project: %s; function %s (%s) not found.",
+		    projectName, function, gcnoFile);
+		throw new DBException(s);
+	    }
 
 	    final List<Block> blocks = getBlocks(functionID, buildID);
 	    final List<Arc> arcs = getArcs(functionID, buildID);

@@ -7,7 +7,6 @@ import com.maroontress.uncover.Function;
 import com.maroontress.uncover.FunctionGraph;
 import com.maroontress.uncover.Graph;
 import java.sql.Connection;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
@@ -20,8 +19,8 @@ public final class CommitDeal {
     /** コミット情報です。 */
     private CommitSource source;
 
-    /** 関数テーブルの行を取得するインスタンスです。 */
-    private Fetcher<FunctionRow> functionRowFetcher;
+    /** 関数IDを取得するインスタンスです。 */
+    private FunctionResolver functionResolver;
 
     /** 関数テーブルに行を追加するインスタンスです。 */
     private Adder<FunctionRow> functionRowAdder;
@@ -50,15 +49,10 @@ public final class CommitDeal {
 	this.con = con;
 	this.source = source;
 
-	FunctionRow functionRow = new FunctionRow();
-
-	functionRowFetcher = new QuerierFactory<FunctionRow>(
-	    con, Table.FUNCTION, FunctionRow.class).createFetcher("id");
-	functionRowFetcher.setRow(functionRow);
-
+	functionResolver = new FunctionResolver(con);
 	functionRowAdder = new QuerierFactory<FunctionRow>(
 	    con, Table.FUNCTION, FunctionRow.class).createAdder();
-	functionRowAdder.setRow(functionRow);
+	functionRowAdder.setRow(functionResolver.getFunctionRow());
 
 	graphRowAdder = new QuerierFactory<GraphRow>(
 	    con, Table.GRAPH, GraphRow.class).createAdder();
@@ -126,21 +120,8 @@ public final class CommitDeal {
 	    = source.getAllFunctionGraphs();
 	for (FunctionGraph functionGraph : allFunctionGraphs) {
 	    Function function = functionGraph.getFunction();
-	    functionRowFetcher.getRow().set(function.getName(),
-					    function.getGCNOFile(),
-					    projectID);
-	    ResultSet rs = functionRowFetcher.executeQuery();
-	    String functionID = null;
-	    int k;
-	    for (k = 0; rs.next(); ++k) {
-		functionID = rs.getString("id");
-	    }
-	    if (k > 1) {
-		String s = String.format(
-		    "projectID: %s; function %s (%s) found more than one.",
-		    projectID, function.getName(), function.getGCNOFile());
-		throw new TableInconsistencyException(s);
-	    }
+	    String functionID = functionResolver.getFunctionID(
+		function.getName(), function.getGCNOFile(), projectID);
 	    if (functionID == null) {
 		functionRowAdder.execute();
 		functionID = functionRowAdder.getGeneratedKey(1);

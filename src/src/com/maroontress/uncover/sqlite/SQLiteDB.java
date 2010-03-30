@@ -174,31 +174,6 @@ public final class SQLiteDB implements DB {
     }
 
     /**
-       コンパイル済みのステートメントにパラメータを設定します。
-
-       @param s ステートメント
-       @param values パラメータの値の配列
-       @throws SQLException エラーが発生したときにスローします。
-    */
-    private static void setParameter(final PreparedStatement s,
-				     final Object[] values)
-	throws SQLException {
-	// ListCreator.setParameter()とまとめる
-	int k = 0;
-	for (Object v : values) {
-	    ++k;
-	    if (v instanceof String) {
-		s.setString(k, (String) v);
-	    } else if (v instanceof Integer) {
-		s.setInt(k, (Integer) v);
-	    } else {
-		throw new IllegalArgumentException("unexpected type: "
-						   + v.getClass().toString());
-	    }
-	}
-    }
-
-    /**
        ビルドのリストを取得します。
 
        @param template クエリ文字列
@@ -446,9 +421,8 @@ public final class SQLiteDB implements DB {
 			     final String projectID) throws SQLException {
 	String template = String.format(
 	    "DELETE FROM %s WHERE id = ? and projectID = ?;", Table.BUILD);
-	PreparedStatement s = con.prepareStatement(template);
-	setParameter(s, new Object[] {id, projectID});
-	s.execute();
+	SimpleQuery query = new SimpleQuery(con);
+	query.execute(template, new Object[] {id, projectID});
 	removeUnreferencedRows();
     }
 
@@ -483,9 +457,8 @@ public final class SQLiteDB implements DB {
 	String template = String.format(
 	    "DELETE FROM %s WHERE revision = ? and projectID = ?;",
 	    Table.BUILD);
-	PreparedStatement s = con.prepareStatement(template);
-	setParameter(s, new Object[] {revision, projectID});
-	s.execute();
+	SimpleQuery query = new SimpleQuery(con);
+	query.execute(template, new Object[] {revision, projectID});
 	removeUnreferencedRows();
     }
 
@@ -515,20 +488,16 @@ public final class SQLiteDB implements DB {
        @throws SQLException エラーが発生したときにスローします。
     */
     private void removeProject(final String projectID) throws SQLException {
-	PreparedStatement s;
+	SimpleQuery query = new SimpleQuery(con);
 	String template;
 
 	template = String.format("DELETE FROM %s WHERE id = ?;",
 				 Table.PROJECT);
-	s = con.prepareStatement(template);
-	setParameter(s, new Object[] {projectID});
-	s.execute();
+	query.execute(template, new Object[] {projectID});
 
 	template = String.format("DELETE FROM %s WHERE projectID = ?;",
 				 Table.BUILD);
-	s = con.prepareStatement(template);
-	setParameter(s, new Object[] {projectID});
-	s.execute();
+	query.execute(template, new Object[] {projectID});
 
 	removeUnreferencedRows();
     }

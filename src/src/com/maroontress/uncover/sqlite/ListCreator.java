@@ -2,7 +2,6 @@ package com.maroontress.uncover.sqlite;
 
 import com.maroontress.uncover.Toolkit;
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -14,8 +13,8 @@ import java.util.List;
    @param <X> 生成するリストの要素となるクラス
 */
 public abstract class ListCreator<X> {
-    /** JDBCの接続です。 */
-    private Connection con;
+    /** クエリを実行するインスタンスです。 */
+    private SimpleQuery query;
 
     /**
        デフォルトコンストラクタは利用できません。
@@ -29,7 +28,7 @@ public abstract class ListCreator<X> {
        @param con JDBCの接続
     */
     public ListCreator(final Connection con) {
-	this.con = con;
+	this.query = new SimpleQuery(con);
     }
 
     /**
@@ -58,9 +57,7 @@ public abstract class ListCreator<X> {
     */
     public final List<X> getList(final String template,
 				 final Object[] params) throws SQLException {
-	PreparedStatement s = con.prepareStatement(template);
-	setParameter(s, params);
-	ResultSet rs = s.executeQuery();
+	ResultSet rs = query.executeQuery(template, params);
 
 	Toolkit toolkit = Toolkit.getInstance();
 	Row source = getRow();
@@ -70,29 +67,5 @@ public abstract class ListCreator<X> {
 	    list.add(create(toolkit));
 	}
 	return list;
-    }
-
-    /**
-       コンパイル済みのステートメントにパラメータを設定します。
-
-       @param s ステートメント
-       @param values パラメータの値の配列
-       @throws SQLException エラーが発生したときにスローします。
-    */
-    private static void setParameter(final PreparedStatement s,
-				     final Object[] values)
-	throws SQLException {
-	int k = 0;
-	for (Object v : values) {
-	    ++k;
-	    if (v instanceof String) {
-		s.setString(k, (String) v);
-	    } else if (v instanceof Integer) {
-		s.setInt(k, (Integer) v);
-	    } else {
-		throw new IllegalArgumentException("unexpected type: "
-						   + v.getClass().toString());
-	    }
-	}
     }
 }

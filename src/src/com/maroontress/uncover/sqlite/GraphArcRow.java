@@ -10,10 +10,10 @@ public final class GraphArcRow extends Row {
     private String graphID;
 
     /** 始点となるブロックの番号です。 */
-    private int start;
+    private int startBlock;
 
     /** 終点となるブロックの番号です。 */
-    private int end;
+    private int endBlock;
 
     /** アークの実行回数です。 */
     private int count;
@@ -35,8 +35,8 @@ public final class GraphArcRow extends Row {
     */
     public void set(final String graphID, final Arc arc) {
 	this.graphID = graphID;
-	start = arc.getStart();
-	end = arc.getEnd();
+	startBlock = arc.getStart();
+	endBlock = arc.getEnd();
 	count = arc.getCount();
 	fake = (arc.isFake()) ? 1 : 0;
     }

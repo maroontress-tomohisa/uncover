@@ -7,10 +7,10 @@ import com.maroontress.uncover.ArcSource;
 */
 public final class ResultSetArcSource extends Row implements ArcSource {
     /** 始点となる基本ブロックの番号です。 */
-    private int start;
+    private int startBlock;
 
     /** 終点となる基本ブロックの番号です。 */
-    private int end;
+    private int endBlock;
 
     /** 実行回数です。 */
     private int count;
@@ -26,12 +26,12 @@ public final class ResultSetArcSource extends Row implements ArcSource {
 
     /** {@inheritDoc} */
     public int getStart() {
-	return start;
+	return startBlock;
     }
 
     /** {@inheritDoc} */
     public int getEnd() {
-	return end;
+	return endBlock;
     }
 
     /** {@inheritDoc} */

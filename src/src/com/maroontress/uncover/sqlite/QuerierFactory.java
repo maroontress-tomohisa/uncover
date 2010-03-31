@@ -3,6 +3,7 @@ package com.maroontress.uncover.sqlite;
 import java.lang.reflect.Field;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 /**
    クエリを発行するインスタンスを生成します。
@@ -50,7 +51,8 @@ public final class QuerierFactory<T extends Row> {
 	    prefix = ", ";
 	}
 	s += ")";
-	return new Adder<T>(con.prepareStatement(s));
+	return new Adder<T>(
+	    con.prepareStatement(s, Statement.RETURN_GENERATED_KEYS));
     }
 
     /**

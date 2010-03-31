@@ -14,6 +14,7 @@ public final class FieldArray {
     static {
 	typeMap = new HashMap<Class<?>, String>();
 	typeMap.put(int.class, "INTEGER");
+	typeMap.put(long.class, "INTEGER");
 	typeMap.put(String.class, "LONG VARCHAR");
     }
 
@@ -49,7 +50,7 @@ public final class FieldArray {
        @param separator フィールド名の区切り文字列
        @return フィールド名を区切り文字列をはさんで連結した文字列
     */
-    public static String concatNames(final Class clazz,
+    public static String concatNames(final Class<? extends Row> clazz,
 				     final String separator) {
 	return concatNames(clazz.getDeclaredFields(), separator);
     }
@@ -85,7 +86,7 @@ public final class FieldArray {
        @return フィールド名と型名を空白で連結したものを区切り文字列を
        はさんで連結した文字列
     */
-    public static String concatNameTypes(final Class clazz,
+    public static String concatNameTypes(final Class<? extends Row> clazz,
 					 final String separator) {
 	return concatNameTypes(clazz.getDeclaredFields(), separator);
     }

@@ -113,13 +113,13 @@ public interface DB {
        グラフを取得します。
 
        @param projectName プロジェクト名
-       @param buildID ビルドID
+       @param id ビルドID
        @param function 関数名
        @param gcnoFile GCNOファイル名
        @return グラフ
        @throws DBException データベース操作に関するエラーが発生したと
        きにスローします。
     */
-    Graph getGraph(String projectName, String buildID, String function,
+    Graph getGraph(String projectName, String id, String function,
 		   String gcnoFile) throws DBException;
 }

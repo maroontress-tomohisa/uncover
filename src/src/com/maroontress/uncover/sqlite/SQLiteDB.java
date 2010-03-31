@@ -208,7 +208,7 @@ public final class SQLiteDB implements DB {
        @throws SQLException エラーが発生したときにスローします。
     */
     private List<Build> queryBuilds(final String revision,
-				    final String projectID)
+				    final long projectID)
 	throws SQLException {
 	String template = String.format(
 	    "SELECT * FROM %s WHERE revision = ? and projectID = ?",
@@ -223,8 +223,8 @@ public final class SQLiteDB implements DB {
 	verifyIntegrity();
 	try {
 	    ProjectDeal projectDeal = new ProjectDeal(con);
-	    String projectID = projectDeal.queryID(projectName);
-	    if (projectID == null) {
+	    long projectID = projectDeal.queryID(projectName);
+	    if (projectID == -1) {
 		throw new DBException("project not found: " + projectName);
 	    }
 	    List<Build> list = queryBuilds(revision, projectID);
@@ -241,17 +241,17 @@ public final class SQLiteDB implements DB {
     /**
        ビルドを取得します。
 
-       @param id ビルドID
+       @param buildID ビルドID
        @param projectID プロジェクトID
        @return ビルドのリスト
        @throws SQLException エラーが発生したときにスローします。
     */
-    private List<Build> queryBuild(final String id, final String projectID)
-	throws SQLException {
+    private List<Build> queryBuild(final long buildID,
+				   final long projectID) throws SQLException {
 	String template = String.format(
 	    "SELECT * FROM %s WHERE id = ? and projectID = ?",
 	    Table.BUILD);
-	Object[] params = new Object[] {id, projectID};
+	Object[] params = new Object[] {buildID, projectID};
 	return getBuildList(template, params);
     }
 
@@ -261,11 +261,12 @@ public final class SQLiteDB implements DB {
 	verifyIntegrity();
 	try {
 	    ProjectDeal projectDeal = new ProjectDeal(con);
-	    String projectID = projectDeal.queryID(projectName);
-	    if (projectID == null) {
+	    long buildID = Long.parseLong(id);
+	    long projectID = projectDeal.queryID(projectName);
+	    if (projectID == -1) {
 		throw new DBException("project not found: " + projectName);
 	    }
-	    List<Build> list = queryBuild(id, projectID);
+	    List<Build> list = queryBuild(buildID, projectID);
 	    if (list.size() == 0) {
 		throw new DBException("not found: @" + id);
 	    }
@@ -329,7 +330,7 @@ public final class SQLiteDB implements DB {
        @return リビジョン名のリスト
        @throws SQLException エラーが発生したときにスローします。
     */
-    private List<String> queryRevisionNames(final String projectID)
+    private List<String> queryRevisionNames(final long projectID)
 	throws SQLException {
 	String template = String.format(
 	    "SELECT * FROM %s WHERE projectID = ?",
@@ -354,8 +355,8 @@ public final class SQLiteDB implements DB {
 	verifyIntegrity();
 	try {
 	    ProjectDeal projectDeal = new ProjectDeal(con);
-	    String projectID = projectDeal.queryID(projectName);
-	    if (projectID == null) {
+	    long projectID = projectDeal.queryID(projectName);
+	    if (projectID == -1) {
 		throw new DBException("project not found: " + projectName);
 	    }
 	    List<String> list = queryRevisionNames(projectID);
@@ -417,8 +418,8 @@ public final class SQLiteDB implements DB {
        @param projectID プロジェクトID
        @throws SQLException エラーが発生したときにスローします。
     */
-    private void removeBuild(final String id,
-			     final String projectID) throws SQLException {
+    private void removeBuild(final long id,
+			     final long projectID) throws SQLException {
 	String template = String.format(
 	    "DELETE FROM %s WHERE id = ? and projectID = ?", Table.BUILD);
 	SimpleQuery query = new SimpleQuery(con);
@@ -432,11 +433,12 @@ public final class SQLiteDB implements DB {
 	verifyIntegrity();
 	try {
 	    ProjectDeal projectDeal = new ProjectDeal(con);
-	    String projectID = projectDeal.queryID(projectName);
-	    if (projectID == null) {
+	    long buildID = Long.parseLong(id);
+	    long projectID = projectDeal.queryID(projectName);
+	    if (projectID == -1) {
 		throw new DBException("project not found: " + projectName);
 	    }
-	    removeBuild(id, projectID);
+	    removeBuild(buildID, projectID);
 	    con.commit();
 	} catch (SQLException e) {
 	    rollback();
@@ -453,7 +455,7 @@ public final class SQLiteDB implements DB {
        @throws SQLException エラーが発生したときにスローします。
     */
     private void removeBuilds(final String revision,
-			      final String projectID) throws SQLException {
+			      final long projectID) throws SQLException {
 	String template = String.format(
 	    "DELETE FROM %s WHERE revision = ? and projectID = ?",
 	    Table.BUILD);
@@ -468,8 +470,8 @@ public final class SQLiteDB implements DB {
 	verifyIntegrity();
 	try {
 	    ProjectDeal projectDeal = new ProjectDeal(con);
-	    String projectID = projectDeal.queryID(projectName);
-	    if (projectID == null) {
+	    long projectID = projectDeal.queryID(projectName);
+	    if (projectID == -1) {
 		throw new DBException("project not found: " + projectName);
 	    }
 	    removeBuilds(revision, projectID);
@@ -487,7 +489,7 @@ public final class SQLiteDB implements DB {
        @param projectID プロジェクトID
        @throws SQLException エラーが発生したときにスローします。
     */
-    private void removeProject(final String projectID) throws SQLException {
+    private void removeProject(final long projectID) throws SQLException {
 	SimpleQuery query = new SimpleQuery(con);
 	String template;
 
@@ -507,8 +509,8 @@ public final class SQLiteDB implements DB {
 	verifyIntegrity();
 	try {
 	    ProjectDeal projectDeal = new ProjectDeal(con);
-	    String projectID = projectDeal.queryID(projectName);
-	    if (projectID == null) {
+	    long projectID = projectDeal.queryID(projectName);
+	    if (projectID == -1) {
 		throw new DBException("project not found: " + projectName);
 	    }
 	    removeProject(projectID);
@@ -528,8 +530,8 @@ public final class SQLiteDB implements DB {
        @return ブロックのリスト
        @throws SQLException エラーが発生したときにスローします。
     */
-    private List<Block> getBlocks(final String functionID,
-				  final String buildID) throws SQLException {
+    private List<Block> getBlocks(final long functionID,
+				  final long buildID) throws SQLException {
 	String template = String.format(
 	    "SELECT %s FROM %s gb"
 	    + " INNER JOIN %s g ON g.id = gb.graphID"
@@ -558,8 +560,8 @@ public final class SQLiteDB implements DB {
        @return アークのリスト
        @throws SQLException エラーが発生したときにスローします。
     */
-    private List<Arc> getArcs(final String functionID,
-			      final String buildID) throws SQLException {
+    private List<Arc> getArcs(final long functionID,
+			      final long buildID) throws SQLException {
 	String template = String.format(
 	    "SELECT %s FROM %s ga"
 	    + " INNER JOIN %s g ON g.id = ga.graphID"
@@ -581,27 +583,28 @@ public final class SQLiteDB implements DB {
     }
 
     /** {@inheritDoc} */
-    public Graph getGraph(final String projectName, final String buildID,
-			  final String function,
-			  final String gcnoFile) throws DBException {
+    public Graph getGraph(final String projectName, final String id,
+			  final String function, final String gcnoFile)
+	throws DBException {
 	verifyIntegrity();
 	try {
 	    ProjectDeal projectDeal = new ProjectDeal(con);
-	    String projectID = projectDeal.queryID(projectName);
-	    if (projectID == null) {
+	    long projectID = projectDeal.queryID(projectName);
+	    if (projectID == -1) {
 		throw new DBException("project not found: " + projectName);
 	    }
 
 	    FunctionResolver functionResolver = new FunctionResolver(con);
-            String functionID = functionResolver.getFunctionID(
+            long functionID = functionResolver.getFunctionID(
 		function, gcnoFile, projectID);
-	    if (functionID == null) {
+	    if (functionID == -1) {
 		String s = String.format(
 		    "project: %s; function %s (%s) not found.",
 		    projectName, function, gcnoFile);
 		throw new DBException(s);
 	    }
 
+	    long buildID = Long.parseLong(id);
 	    final List<Block> blocks = getBlocks(functionID, buildID);
 	    final List<Arc> arcs = getArcs(functionID, buildID);
 	    Toolkit toolkit = Toolkit.getInstance();

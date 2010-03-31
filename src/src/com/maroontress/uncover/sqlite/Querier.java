@@ -72,8 +72,13 @@ public abstract class Querier<T extends Row> {
 		Class<?> clazz = field.getType();
 		if (clazz == int.class) {
 		    ps.setInt(offset, field.getInt(instance));
-		} else {
+		} else if (clazz == long.class) {
+		    ps.setLong(offset, field.getLong(instance));
+		} else if (clazz == String.class) {
 		    ps.setString(offset, (String) field.get(instance));
+		} else {
+		    throw new RuntimeException(
+			"internal error: unexpected type.");
 		}
 		++offset;
 	    }

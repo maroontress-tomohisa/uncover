@@ -11,7 +11,7 @@ public final class FunctionRow extends Row {
     private String gcnoFile;
 
     /** プロジェクトIDです。 */
-    private String projectID;
+    private long projectID;
 
     /**
        インスタンスを生成します。
@@ -27,7 +27,7 @@ public final class FunctionRow extends Row {
        @param projectID プロジェクトID
     */
     public void set(final String name, final String gcnoFile,
-		    final String projectID) {
+		    final long projectID) {
 	this.name = name;
 	this.gcnoFile = gcnoFile;
 	this.projectID = projectID;

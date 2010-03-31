@@ -77,6 +77,8 @@ public final class SimpleQuery {
 		s.setString(k, (String) v);
 	    } else if (v instanceof Integer) {
 		s.setInt(k, (Integer) v);
+	    } else if (v instanceof Long) {
+		s.setLong(k, (Long) v);
 	    } else {
 		throw new IllegalArgumentException("unexpected type: "
 						   + v.getClass().toString());

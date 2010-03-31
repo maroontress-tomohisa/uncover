@@ -47,9 +47,9 @@ public final class Adder<T extends Row> extends Querier<T> {
        @return 自動生成されたキー
        @throws SQLException クエリにエラーが発生したときにスローします。
     */
-    public String getGeneratedKey(final int num) throws SQLException {
+    public long getGeneratedKey(final int num) throws SQLException {
 	ResultSet rs = getGeneratedKeys();
 	rs.next();
-	return rs.getString(num);
+	return rs.getLong(num);
     }
 }

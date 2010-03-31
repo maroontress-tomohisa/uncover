@@ -37,24 +37,24 @@ public final class FunctionResolver {
        関数名、gcnoファイル名、プロジェクトIDを指定して、関数IDを取得
        します。
 
-       関数IDが存在しない場合はnullを返します。
+       マッチする関数IDが存在しない場合は-1を返します。
 
        @param functionName 関数名
        @param gcnoFile gcnoファイル名
        @param projectID プロジェクトID
-       @return 関数ID、またはnull
+       @return 関数ID、または-1
        @throws SQLException クエリにエラーが発生したときにスローします。
     */
-    public String getFunctionID(final String functionName,
-				final String gcnoFile,
-				final String projectID) throws SQLException {
+    public long getFunctionID(final String functionName,
+			      final String gcnoFile,
+			      final long projectID) throws SQLException {
 	fetcher.getRow().set(functionName, gcnoFile, projectID);
 	ResultSet rs = fetcher.executeQuery();
 
-	String functionID = null;
+	long functionID = -1;
 	int k;
 	for (k = 0; rs.next(); ++k) {
-	    functionID = rs.getString("id");
+	    functionID = rs.getLong("id");
 	}
 	if (k > 1) {
 	    String s = String.format(

@@ -82,10 +82,10 @@ public final class CommitDeal {
        @return プロジェクトID
        @throws SQLException クエリにエラーが発生したときにスローします。
     */
-    private String getProjectID(final String name) throws SQLException {
+    private long getProjectID(final String name) throws SQLException {
 	ProjectDeal projectDeal = new ProjectDeal(con);
-	String projectID = projectDeal.queryID(name);
-	if (projectID == null) {
+	long projectID = projectDeal.queryID(name);
+	if (projectID == -1) {
 	    Adder<ProjectRow> adder = new QuerierFactory<ProjectRow>(
 		con, Table.PROJECT, ProjectRow.class).createAdder();
 	    adder.setRow(new ProjectRow());
@@ -105,7 +105,7 @@ public final class CommitDeal {
        @throws SQLException クエリにエラーが発生したときにスローします。
     */
     public void run() throws SQLException {
-	String projectID = getProjectID(source.getProjectName());
+	long projectID = getProjectID(source.getProjectName());
 
 	Adder<BuildRow> buildRowAdder = new QuerierFactory<BuildRow>(
 	    con, Table.BUILD, BuildRow.class).createAdder();
@@ -114,15 +114,15 @@ public final class CommitDeal {
 		     source.getPlatform(), projectID);
 	buildRowAdder.setRow(buildRow);
 	buildRowAdder.execute();
-	String buildID = buildRowAdder.getGeneratedKey(1);
+	long buildID = buildRowAdder.getGeneratedKey(1);
 
 	Iterable<FunctionGraph> allFunctionGraphs
 	    = source.getAllFunctionGraphs();
 	for (FunctionGraph functionGraph : allFunctionGraphs) {
 	    Function function = functionGraph.getFunction();
-	    String functionID = functionResolver.getFunctionID(
+	    long functionID = functionResolver.getFunctionID(
 		function.getName(), function.getGCNOFile(), projectID);
-	    if (functionID == null) {
+	    if (functionID == -1) {
 		functionRowAdder.execute();
 		functionID = functionRowAdder.getGeneratedKey(1);
 		System.err.println("function " + function.getName() + " ("
@@ -132,7 +132,7 @@ public final class CommitDeal {
 
 	    graphRowAdder.getRow().set(functionID, buildID);
 	    graphRowAdder.execute();
-	    String graphID = graphRowAdder.getGeneratedKey(1);
+	    long graphID = graphRowAdder.getGeneratedKey(1);
 
 	    graphSummaryRowAdder.getRow().set(graphID, function);
 	    graphSummaryRowAdder.execute();

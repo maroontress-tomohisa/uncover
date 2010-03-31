@@ -14,7 +14,7 @@ public final class BuildRow extends Row {
     private String platform;
 
     /** プロジェクトIDです。 */
-    private String projectID;
+    private long projectID;
 
     /**
        インスタンスを生成します。
@@ -31,7 +31,7 @@ public final class BuildRow extends Row {
        @param projectID プロジェクトID
     */
     public void set(final String revision, final String timestamp,
-		    final String platform, final String projectID) {
+		    final String platform, final long projectID) {
 	this.revision = revision;
 	this.timestamp = timestamp;
 	this.platform = platform;

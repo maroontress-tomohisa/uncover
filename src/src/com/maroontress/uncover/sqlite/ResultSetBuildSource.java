@@ -7,7 +7,7 @@ import com.maroontress.uncover.BuildSource;
 */
 public final class ResultSetBuildSource extends Row implements BuildSource {
     /** ビルドIDです。 */
-    private String id;
+    private long id;
 
     /** リビジョンです。 */
     private String revision;
@@ -26,7 +26,7 @@ public final class ResultSetBuildSource extends Row implements BuildSource {
 
     /** {@inheritDoc} */
     public String getID() {
-	return id;
+	return Long.toString(id);
     }
 
     /** {@inheritDoc} */

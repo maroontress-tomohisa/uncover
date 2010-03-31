@@ -30,8 +30,13 @@ public abstract class Row {
 		Class<?> clazz = field.getType();
 		if (clazz == int.class) {
 		    field.setInt(this, row.getInt(name));
-		} else {
+		} else if (clazz == long.class) {
+		    field.setLong(this, row.getLong(name));
+		} else if (clazz == String.class) {
 		    field.set(this, row.getString(name));
+		} else {
+		    throw new RuntimeException(
+			"internal error: unexpected type.");
 		}
 	    }
 	} catch (IllegalAccessException e) {

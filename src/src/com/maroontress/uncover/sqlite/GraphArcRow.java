@@ -7,7 +7,7 @@ import com.maroontress.uncover.Arc;
 */
 public final class GraphArcRow extends Row {
     /** グラフIDです。 */
-    private String graphID;
+    private long graphID;
 
     /** 始点となるブロックの番号です。 */
     private int startBlock;
@@ -33,7 +33,7 @@ public final class GraphArcRow extends Row {
        @param graphID グラフID
        @param arc アーク
     */
-    public void set(final String graphID, final Arc arc) {
+    public void set(final long graphID, final Arc arc) {
 	this.graphID = graphID;
 	startBlock = arc.getStart();
 	endBlock = arc.getEnd();

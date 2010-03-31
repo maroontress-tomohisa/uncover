@@ -7,7 +7,7 @@ import com.maroontress.uncover.Block;
 */
 public final class GraphBlockRow extends Row {
     /** グラフIDです。 */
-    private String graphID;
+    private long graphID;
 
     /** ブロックの番号です。 */
     private int number;
@@ -33,7 +33,7 @@ public final class GraphBlockRow extends Row {
        @param graphID グラフID
        @param block 基本ブロック
     */
-    public void set(final String graphID, final Block block) {
+    public void set(final long graphID, final Block block) {
 	this.graphID = graphID;
 	number = block.getNumber();
 	count = block.getCount();

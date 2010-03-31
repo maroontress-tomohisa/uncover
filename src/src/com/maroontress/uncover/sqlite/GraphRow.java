@@ -5,10 +5,10 @@ package com.maroontress.uncover.sqlite;
 */
 public final class GraphRow extends Row {
     /** 関数IDです。 */
-    private String functionID;
+    private long functionID;
 
     /** ビルドID */
-    private String buildID;
+    private long buildID;
 
     /**
        インスタンスを生成します。
@@ -22,7 +22,7 @@ public final class GraphRow extends Row {
        @param functionID 関数ID
        @param buildID ビルドID
     */
-    public void set(final String functionID, final String buildID) {
+    public void set(final long functionID, final long buildID) {
 	this.functionID = functionID;
 	this.buildID = buildID;
     }

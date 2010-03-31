@@ -7,7 +7,7 @@ import com.maroontress.uncover.Function;
 */
 public final class GraphSummaryRow extends Row {
     /** グラフIDです。 */
-    private String graphID;
+    private long graphID;
 
     /** チェックサムです。 */
     private String checkSum;
@@ -45,7 +45,7 @@ public final class GraphSummaryRow extends Row {
        @param graphID グラフID
        @param function 関数
     */
-    public void set(final String graphID, final Function function) {
+    public void set(final long graphID, final Function function) {
 	this.graphID = graphID;
 	checkSum = function.getCheckSum();
 	sourceFile = function.getSourceFile();

@@ -26,18 +26,21 @@ public final class ProjectDeal {
     /**
        プロジェクト名からプロジェクトIDを取得します。
 
+       プロジェクト名にマッチするプロジェクトが見つからない場合は-1を
+       返します。
+
        @param name プロジェクト名
-       @return プロジェクトID
+       @return プロジェクトID、または-1
        @throws SQLException クエリにエラーが発生したときにスローします。
     */
-    public String queryID(final String name) throws SQLException {
+    public long queryID(final String name) throws SQLException {
 	fetcher.getRow().set(name);
 	ResultSet rs = fetcher.executeQuery();
 	int k;
-	String id = null;
+	long id = -1;
 
 	for (k = 0; rs.next(); ++k) {
-	    id = rs.getString("id");
+	    id = rs.getLong("id");
 	}
 	if (k > 1) {
 	    String m = String.format("project '%s' found more than one.",

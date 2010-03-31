@@ -21,6 +21,17 @@ public final class InitDeal {
     }
 
     /**
+       テーブルの行クラスから、テーブルの列定義となる文字列を取得します。
+
+       @param clazz 行クラス
+       @return テーブルの列定義となる文字列
+    */
+    private static String getTableDefinition(
+	final Class<? extends Row> clazz) {
+	return FieldArray.concatNameTypes(clazz, ", ");
+    }
+
+    /**
        必要なテーブルをすべて生成します。
 
        @throws SQLException クエリにエラーが発生したときにスローします。
@@ -28,32 +39,32 @@ public final class InitDeal {
     public void run() throws SQLException {
 	Statement s = con.createStatement();
 	s.executeUpdate("CREATE TABLE " + Table.CONFIG + " ("
-			+ FieldArray.concatNames(ConfigRow.class, ", ")
+			+ getTableDefinition(ConfigRow.class)
 			+ ")");
 	s.executeUpdate("CREATE TABLE " + Table.PROJECT + " ("
 			+ "id INTEGER PRIMARY KEY, "
-			+ FieldArray.concatNames(ProjectRow.class, ", ")
+			+ getTableDefinition(ProjectRow.class)
 			+ ")");
 	s.executeUpdate("CREATE TABLE " + Table.BUILD + " ("
 			+ "id INTEGER PRIMARY KEY, "
-			+ FieldArray.concatNames(BuildRow.class, ", ")
+			+ getTableDefinition(BuildRow.class)
 			+ ")");
 	s.executeUpdate("CREATE TABLE " + Table.FUNCTION + " ("
 			+ "id INTEGER PRIMARY KEY, "
-			+ FieldArray.concatNames(FunctionRow.class, ", ")
+			+ getTableDefinition(FunctionRow.class)
 			+ ")");
 	s.executeUpdate("CREATE TABLE " + Table.GRAPH + " ("
 			+ "id INTEGER PRIMARY KEY, "
-			+ FieldArray.concatNames(GraphRow.class, ", ")
+			+ getTableDefinition(GraphRow.class)
 			+ ")");
 	s.executeUpdate("CREATE TABLE " + Table.GRAPH_SUMMARY + " ("
-			+ FieldArray.concatNames(GraphSummaryRow.class, ", ")
+			+ getTableDefinition(GraphSummaryRow.class)
 			+ ")");
 	s.executeUpdate("CREATE TABLE " + Table.GRAPH_BLOCK + " ("
-			+ FieldArray.concatNames(GraphBlockRow.class, ", ")
+			+ getTableDefinition(GraphBlockRow.class)
 			+ ")");
 	s.executeUpdate("CREATE TABLE " + Table.GRAPH_ARC + " ("
-			+ FieldArray.concatNames(GraphArcRow.class, ", ")
+			+ getTableDefinition(GraphArcRow.class)
 			+ ")");
 
 	Adder<ConfigRow> adder = new QuerierFactory<ConfigRow>(

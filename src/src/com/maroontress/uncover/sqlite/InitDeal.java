@@ -29,32 +29,32 @@ public final class InitDeal {
 	Statement s = con.createStatement();
 	s.executeUpdate("CREATE TABLE " + Table.CONFIG + " ("
 			+ FieldArray.concatNames(ConfigRow.class, ", ")
-			+ ");");
+			+ ")");
 	s.executeUpdate("CREATE TABLE " + Table.PROJECT + " ("
 			+ "id INTEGER PRIMARY KEY, "
 			+ FieldArray.concatNames(ProjectRow.class, ", ")
-			+ ");");
+			+ ")");
 	s.executeUpdate("CREATE TABLE " + Table.BUILD + " ("
 			+ "id INTEGER PRIMARY KEY, "
 			+ FieldArray.concatNames(BuildRow.class, ", ")
-			+ ");");
+			+ ")");
 	s.executeUpdate("CREATE TABLE " + Table.FUNCTION + " ("
 			+ "id INTEGER PRIMARY KEY, "
 			+ FieldArray.concatNames(FunctionRow.class, ", ")
-			+ ");");
+			+ ")");
 	s.executeUpdate("CREATE TABLE " + Table.GRAPH + " ("
 			+ "id INTEGER PRIMARY KEY, "
 			+ FieldArray.concatNames(GraphRow.class, ", ")
-			+ ");");
+			+ ")");
 	s.executeUpdate("CREATE TABLE " + Table.GRAPH_SUMMARY + " ("
 			+ FieldArray.concatNames(GraphSummaryRow.class, ", ")
-			+ ");");
+			+ ")");
 	s.executeUpdate("CREATE TABLE " + Table.GRAPH_BLOCK + " ("
 			+ FieldArray.concatNames(GraphBlockRow.class, ", ")
-			+ ");");
+			+ ")");
 	s.executeUpdate("CREATE TABLE " + Table.GRAPH_ARC + " ("
 			+ FieldArray.concatNames(GraphArcRow.class, ", ")
-			+ ");");
+			+ ")");
 
 	Adder<ConfigRow> adder = new QuerierFactory<ConfigRow>(
 	    con, Table.CONFIG, ConfigRow.class).createAdder();

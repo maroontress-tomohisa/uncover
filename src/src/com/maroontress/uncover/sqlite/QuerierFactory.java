@@ -49,7 +49,7 @@ public final class QuerierFactory<T extends Row> {
 	    s += prefix + "?";
 	    prefix = ", ";
 	}
-	s += ");";
+	s += ")";
 	return new Adder<T>(con.prepareStatement(s));
     }
 
@@ -68,7 +68,6 @@ public final class QuerierFactory<T extends Row> {
 	    s += prefix + field.getName() + " = ?";
 	    prefix = "and ";
 	}
-	s += ";";
 	return new Fetcher<T>(con.prepareStatement(s));
     }
 }

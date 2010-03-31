@@ -111,7 +111,7 @@ public final class SQLiteDB implements DB {
     private void verifyIntegrity() throws DBException {
 	String version = null;
 	try {
-	    String sql = String.format("SELECT * FROM %s;", Table.CONFIG);
+	    String sql = String.format("SELECT * FROM %s", Table.CONFIG);
 	    PreparedStatement s = con.prepareStatement(sql);
 	    ResultSet rs = s.executeQuery();
 	    int k;
@@ -152,7 +152,7 @@ public final class SQLiteDB implements DB {
     */
     private String[] queryProjectNames() throws SQLException {
 	PreparedStatement s = con.prepareStatement(
-	    "SELECT name FROM " + Table.PROJECT + ";");
+	    "SELECT name FROM " + Table.PROJECT);
 	ResultSet rs = s.executeQuery();
 	ArrayList<String> list = new ArrayList<String>();
 	while (rs.next()) {
@@ -211,7 +211,7 @@ public final class SQLiteDB implements DB {
 				    final String projectID)
 	throws SQLException {
 	String template = String.format(
-	    "SELECT * FROM %s WHERE revision = ? and projectID = ?;",
+	    "SELECT * FROM %s WHERE revision = ? and projectID = ?",
 	    Table.BUILD);
 	Object[] params = new Object[] {revision, projectID};
 	return getBuildList(template, params);
@@ -249,7 +249,7 @@ public final class SQLiteDB implements DB {
     private List<Build> queryBuild(final String id, final String projectID)
 	throws SQLException {
 	String template = String.format(
-	    "SELECT * FROM %s WHERE id = ? and projectID = ?;",
+	    "SELECT * FROM %s WHERE id = ? and projectID = ?",
 	    Table.BUILD);
 	Object[] params = new Object[] {id, projectID};
 	return getBuildList(template, params);
@@ -291,7 +291,7 @@ public final class SQLiteDB implements DB {
 	    "SELECT %s FROM %s g"
 	    + " INNER JOIN %s f ON f.id = g.functionID"
 	    + " INNER JOIN %s gs ON g.id = gs.graphID"
-	    + " WHERE g.buildID = ?;",
+	    + " WHERE g.buildID = ?",
 	    FieldArray.concatNames(ResultSetFunctionSource.class, ","),
 	    Table.GRAPH, Table.FUNCTION, Table.GRAPH_SUMMARY);
 	Object[] params = new Object[] {buildID};
@@ -332,7 +332,7 @@ public final class SQLiteDB implements DB {
     private List<String> queryRevisionNames(final String projectID)
 	throws SQLException {
 	String template = String.format(
-	    "SELECT * FROM %s WHERE projectID = ?;",
+	    "SELECT * FROM %s WHERE projectID = ?",
 	    Table.BUILD);
 	Object[] params = new Object[] {projectID};
 
@@ -386,7 +386,7 @@ public final class SQLiteDB implements DB {
 					final String refColumn)
 	throws SQLException {
 	String sql = String.format("DELETE FROM %s WHERE NOT EXISTS ("
-				   + "SELECT * FROM %s g WHERE g.%s = %s.%s);",
+				   + "SELECT * FROM %s g WHERE g.%s = %s.%s)",
 				   table, refTable, refColumn, table, column);
 	con.createStatement().executeUpdate(sql);
     }
@@ -420,7 +420,7 @@ public final class SQLiteDB implements DB {
     private void removeBuild(final String id,
 			     final String projectID) throws SQLException {
 	String template = String.format(
-	    "DELETE FROM %s WHERE id = ? and projectID = ?;", Table.BUILD);
+	    "DELETE FROM %s WHERE id = ? and projectID = ?", Table.BUILD);
 	SimpleQuery query = new SimpleQuery(con);
 	query.execute(template, new Object[] {id, projectID});
 	removeUnreferencedRows();
@@ -455,7 +455,7 @@ public final class SQLiteDB implements DB {
     private void removeBuilds(final String revision,
 			      final String projectID) throws SQLException {
 	String template = String.format(
-	    "DELETE FROM %s WHERE revision = ? and projectID = ?;",
+	    "DELETE FROM %s WHERE revision = ? and projectID = ?",
 	    Table.BUILD);
 	SimpleQuery query = new SimpleQuery(con);
 	query.execute(template, new Object[] {revision, projectID});
@@ -491,11 +491,11 @@ public final class SQLiteDB implements DB {
 	SimpleQuery query = new SimpleQuery(con);
 	String template;
 
-	template = String.format("DELETE FROM %s WHERE id = ?;",
+	template = String.format("DELETE FROM %s WHERE id = ?",
 				 Table.PROJECT);
 	query.execute(template, new Object[] {projectID});
 
-	template = String.format("DELETE FROM %s WHERE projectID = ?;",
+	template = String.format("DELETE FROM %s WHERE projectID = ?",
 				 Table.BUILD);
 	query.execute(template, new Object[] {projectID});
 
@@ -533,7 +533,7 @@ public final class SQLiteDB implements DB {
 	String template = String.format(
 	    "SELECT %s FROM %s gb"
 	    + " INNER JOIN %s g ON g.id = gb.graphID"
-	    + " WHERE g.functionID = ? and g.buildID = ?;",
+	    + " WHERE g.functionID = ? and g.buildID = ?",
 	    FieldArray.concatNames(ResultSetBlockSource.class, ","),
 	    Table.GRAPH_BLOCK, Table.GRAPH);
 	Object[] params = new Object[] {functionID, buildID};
@@ -563,7 +563,7 @@ public final class SQLiteDB implements DB {
 	String template = String.format(
 	    "SELECT %s FROM %s ga"
 	    + " INNER JOIN %s g ON g.id = ga.graphID"
-	    + " WHERE g.functionID = ? and g.buildID = ?;",
+	    + " WHERE g.functionID = ? and g.buildID = ?",
 	    FieldArray.concatNames(ResultSetArcSource.class, ","),
 	    Table.GRAPH_ARC, Table.GRAPH);
 	Object[] params = new Object[] {functionID, buildID};

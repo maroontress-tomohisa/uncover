@@ -15,7 +15,7 @@ public final class FieldArray {
 	typeMap = new HashMap<Class<?>, String>();
 	typeMap.put(int.class, "INTEGER");
 	typeMap.put(long.class, "INTEGER");
-	typeMap.put(String.class, "LONG VARCHAR");
+	typeMap.put(String.class, "TEXT");
     }
 
     /**

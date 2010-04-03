@@ -3,7 +3,8 @@ package com.maroontress.uncover;
 import com.maroontress.cui.OptionListener;
 import com.maroontress.cui.Options;
 import com.maroontress.cui.OptionsParsingException;
-import java.io.InputStream;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.util.Arrays;
 
@@ -13,9 +14,6 @@ import java.util.Arrays;
 public final class Uncover {
     /** ヘルプメッセージのインデント幅です。 */
     private static final int INDENT_WIDTH = 18;
-
-    /** バッファのサイズです。 */
-    private static final int BUFFER_SIZE = 4096;
 
     /** コマンドラインで指定されたコマンドです。 */
     private Command command;
@@ -128,13 +126,13 @@ public final class Uncover {
     /**
        バージョンを出力して終了します。
     */
-    private static void version() {
-        InputStream in = Uncover.class.getResourceAsStream("version");
-        byte[] data = new byte[BUFFER_SIZE];
-        int size;
+    private void version() {
+	BufferedReader in = new BufferedReader(
+	    new InputStreamReader(getClass().getResourceAsStream("version")));
         try {
-            while ((size = in.read(data)) > 0) {
-                System.out.write(data, 0, size);
+	    String s;
+            while ((s = in.readLine()) != null) {
+                System.out.println(s);
             }
             in.close();
         } catch (Exception e) {

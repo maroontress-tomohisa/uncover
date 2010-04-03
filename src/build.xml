@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <project default="all" xmlns:cs="antlib:com.puppycrawl.tools.checkstyle">
   <property name="prefix" location="/usr/local"/>
+  <property name="debug" value="true"/>
   <property name="javadoc_linkurl" value="http://java.sun.com/javase/ja/6/docs/ja/api/"/>
   <property name="javac_options" value="-encoding EUC-JP -Xlint:unchecked -Xlint:deprecation"/>
 
@@ -12,7 +13,7 @@
 
   <target name="compile" depends="destdir">
     <depend srcdir="src" destdir="classes" cache="depcache" closure="true"/>
-    <javac srcdir="src" destdir="classes" debug="true">
+    <javac srcdir="src" destdir="classes" debug="${debug}">
       <compilerarg line="${javac_options}"/>
     </javac>
   </target>
@@ -56,7 +57,7 @@
 
   <target name="clean">
     <delete>
-      <fileset dir="." includes="uncover.jar"/>
+      <fileset dir="." includes="uncover.jar uncover.sh"/>
     </delete>
     <delete dir="html"/>
     <delete dir="classes"/>

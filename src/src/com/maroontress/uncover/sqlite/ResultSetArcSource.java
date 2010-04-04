@@ -13,7 +13,7 @@ public final class ResultSetArcSource extends Row implements ArcSource {
     private int endBlock;
 
     /** 実行回数です。 */
-    private int count;
+    private long count;
 
     /** フェイクかどうかを表します。 */
     private int fake;
@@ -35,7 +35,7 @@ public final class ResultSetArcSource extends Row implements ArcSource {
     }
 
     /** {@inheritDoc} */
-    public int getCount() {
+    public long getCount() {
 	return count;
     }
 

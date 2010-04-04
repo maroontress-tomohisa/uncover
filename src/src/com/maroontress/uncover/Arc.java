@@ -11,7 +11,7 @@ public final class Arc implements ArcSource {
     private int end;
 
     /** 実行回数です。 */
-    private int count;
+    private long count;
 
     /** フェイクかどうかを表します。 */
     private boolean isFake;
@@ -45,7 +45,7 @@ public final class Arc implements ArcSource {
     }
 
     /** {@inheritDoc} */
-    public int getCount() {
+    public long getCount() {
 	return count;
     }
 

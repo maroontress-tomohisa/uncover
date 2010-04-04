@@ -10,7 +10,7 @@ public final class ResultSetBlockSource extends Row implements BlockSource {
     private int number;
 
     /** 実行回数です。 */
-    private int count;
+    private long count;
 
     /** ソースファイルの名前です。 */
     private String sourceFile;
@@ -33,7 +33,7 @@ public final class ResultSetBlockSource extends Row implements BlockSource {
     }
 
     /** {@inheritDoc} */
-    public int getCount() {
+    public long getCount() {
         return count;
     }
 

@@ -38,8 +38,8 @@ public final class ElementArcSource extends ElementSource
     }
 
     /** {@inheritDoc} */
-    public int getCount() {
-	return getIntAttribute(elem, "count");
+    public long getCount() {
+	return getLongAttribute(elem, "count");
     }
 
     /** {@inheritDoc} */

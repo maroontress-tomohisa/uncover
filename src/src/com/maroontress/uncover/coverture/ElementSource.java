@@ -14,7 +14,7 @@ public abstract class ElementSource {
     }
 
     /**
-       属性値を整数として取得します。
+       属性値を32ビット整数として取得します。
 
        属性値が空文字列の場合は0を返します。
 
@@ -26,5 +26,21 @@ public abstract class ElementSource {
 	String v = elem.getAttribute(s);
 
 	return (v.equals("")) ? 0 : Integer.parseInt(v);
+    }
+
+    /**
+       属性値を64ビット整数として取得します。
+
+       属性値が空文字列の場合は0を返します。
+
+       @param elem 要素
+       @param s 属性名
+       @return 属性値
+    */
+    protected static long getLongAttribute(final Element elem,
+					   final String s) {
+	String v = elem.getAttribute(s);
+
+	return (v.equals("")) ? 0 : Long.parseLong(v);
     }
 }

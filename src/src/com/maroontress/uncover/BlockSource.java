@@ -16,7 +16,7 @@ public interface BlockSource {
 
        @return 実行回数
     */
-    int getCount();
+    long getCount();
 
     /**
        ソースファイルの名前を取得します。

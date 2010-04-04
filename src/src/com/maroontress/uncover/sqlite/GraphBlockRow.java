@@ -13,7 +13,7 @@ public final class GraphBlockRow extends Row {
     private int number;
 
     /** ブロックの実行回数です。 */
-    private int count;
+    private long count;
 
     /** ソースファイルです。 */
     private String sourceFile;

@@ -23,7 +23,7 @@ public interface ArcSource {
 
        @return 実行回数
     */
-    int getCount();
+    long getCount();
 
     /**
        フェイクかどうかを取得します。

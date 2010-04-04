@@ -16,7 +16,7 @@ public final class GraphArcRow extends Row {
     private int endBlock;
 
     /** アークの実行回数です。 */
-    private int count;
+    private long count;
 
     /** フェイクかどうかを表します。 */
     private int fake;

@@ -1,5 +1,6 @@
 package com.maroontress.uncover;
 
+import com.maroontress.uncover.gxx.GxxV3Demangler;
 import com.maroontress.uncover.html.Arrow;
 import com.maroontress.uncover.html.Table;
 import com.maroontress.uncover.html.Text;
@@ -131,7 +132,7 @@ public final class RevisionPair {
         out.println(Table.row(h));
         for (Function function : array) {
             String s = ""
-                + Table.dataL(function.getName())
+                + Table.dataL(demangle(function.getName()))
                 + Table.dataL(function.getLocation())
                 + Table.dataR("" + function.getComplexity())
                 + Table.dataR(String.format("%.1f",
@@ -173,7 +174,7 @@ public final class RevisionPair {
     */
     private String rowAllBlocksChanges(final FunctionPair pair) {
 	Function function = pair.getRight();
-        return Table.dataL(function.getName())
+        return Table.dataL(demangle(function.getName()))
             + Table.dataL(function.getLocation())
 	    //
             + Table.dataR(trend.allBlocks(pair))
@@ -223,7 +224,7 @@ public final class RevisionPair {
     */
     private String rowComplexChanges(final FunctionPair pair) {
 	Function function = pair.getRight();
-        return Table.dataL(function.getName())
+        return Table.dataL(demangle(function.getName()))
             + Table.dataL(function.getLocation())
 	    //
             + Table.dataR(trend.complexity(pair))
@@ -268,7 +269,7 @@ public final class RevisionPair {
     */
     private String rowUnexecutedBlocksChanges(final FunctionPair pair) {
 	Function function = pair.getRight();
-	return Table.dataL(function.getName())
+	return Table.dataL(demangle(function.getName()))
             + Table.dataL(function.getLocation())
 	    //
             + Table.dataR(trend.unexecutedBlocks(pair))
@@ -325,7 +326,7 @@ public final class RevisionPair {
 					final String complexityTrend) {
         return Table.dataR(rankTrend)
             + Table.dataR("" + rank)
-            + Table.dataL(function.getName())
+            + Table.dataL(demangle(function.getName()))
             + Table.dataL(function.getLocation())
             + Table.dataR(complexityTrend)
             + Table.dataR("" + function.getComplexity())
@@ -395,5 +396,15 @@ public final class RevisionPair {
         printComplexityChanges(out);
         printUnexecutedBlocksChanges(out);
         printComplexityRanking(out);
+    }
+
+    /**
+    */
+    public String demangle(final String name) {
+	CxxDemangler d = new GxxV3Demangler(name);
+	return d.getName()
+	    .replace("&", "&amp;")
+	    .replace("<", "&lt;")
+	    .replace(">", "&gt;");
     }
 }

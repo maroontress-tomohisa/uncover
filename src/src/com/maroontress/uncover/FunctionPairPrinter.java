@@ -9,7 +9,7 @@ import java.util.List;
 /**
    関数ペアを出力するためのクラスです。
 */
-abstract class FunctionPairPrinter {
+public abstract class FunctionPairPrinter {
     /** 関数ペアのリストです。 */
     private List<FunctionPair> pairList;
 

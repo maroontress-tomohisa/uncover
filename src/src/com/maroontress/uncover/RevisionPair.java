@@ -399,6 +399,10 @@ public final class RevisionPair {
     }
 
     /**
+       マングルされたシンボル名をデマングルします。
+
+       @param name マングルされた名前
+       @return デマングルした名前
     */
     public String demangle(final String name) {
 	CxxDemangler d = new GxxV3Demangler(name);

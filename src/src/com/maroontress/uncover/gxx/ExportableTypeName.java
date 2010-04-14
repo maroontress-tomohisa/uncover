@@ -1,18 +1,28 @@
 package com.maroontress.uncover.gxx;
 
 /**
+   エクスポータブルによる型名です。
 */
 public final class ExportableTypeName implements TypeName {
-    /** */
+    /** 型の名前です。 */
     private Exportable name;
 
     /**
+       インスタンスを生成します。
+
+       @param name 型名
     */
     public ExportableTypeName(final Exportable name) {
 	this.name = name;
     }
 
     /**
+       インスタンスを生成します。
+
+       コンテキストの直前の文字はSでした。Substitution.parse()を使用し
+       て型名を取得します。
+
+       @param context コンテキスト
     */
     public ExportableTypeName(final Context context) {
 	Substitution.parse(context, new SubstitutionListener() {
@@ -32,8 +42,7 @@ public final class ExportableTypeName implements TypeName {
 	});
     }
 
-    /**
-    */
+    /** {@inheritDoc} */
     public void exportName(final Exporter b) {
 	name.export(b);
     }

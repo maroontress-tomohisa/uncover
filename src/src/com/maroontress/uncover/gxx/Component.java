@@ -3,33 +3,37 @@ package com.maroontress.uncover.gxx;
 import java.util.regex.Matcher;
 
 /**
+   ネームスペースのコンポーネントです。
 */
 public abstract class Component extends Exportable {
-    /** */
+    /** プレフィックスstd::です。*/
     public static final Component STD = new ConstantComponent("std");
 
-    /** */
+    /** 匿名ネームスペースのコンポーネントです。 */
     public static final Component ANONYMOUS_NS
         = new ConstantComponent("(anonymous namespace)");
 
-    /** */
+    /** コンストラクタコンポーネントです。 */
     public static final Component CTOR = new Constructor();
 
-    /** */
+    /** デストラクタコンポーネントです。 */
     public static final Component DTOR = new Destructor();
 
     /**
+       インスタンスを生成します。
     */
     protected Component() {
     }
 
     /**
-    */
-    public static Component create(final Exportable e) {
-	return TemplatedComponent.create(e.toString());
-    }
+       コンポーネントを生成します。
 
-    /**
+       コンテキストの直後には数字、コンストラクタ、デストラクタ、演算
+       子のいずれかが存在します。コンテキストはコンポーネントの名前の
+       分進みます。
+
+       @param context コンテキスト
+       @return コンポーネント
     */
     public static Component create(final Context context) {
 	Matcher m;

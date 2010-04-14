@@ -3,30 +3,31 @@ package com.maroontress.uncover.gxx;
 import java.util.regex.Pattern;
 
 /**
+   パースに使う正規表現を提供します。
 */
 public final class RE {
-    /** */
+    /** デマングル開始のパターンです。 */
     public static final Pattern ENCODING;
 
-    /** */
+    /** グローバルコンストラクタ/デストラクタ開始のパターンです。 */
     public static final Pattern GLOBAL_CTOR_DTOR;
 
-    /** */
+    /** 正の整数にマッチするパターンです。 */
     public static final Pattern NUMBER;
 
-    /** */
+    /** コンストラクタのパターンです。 */
     public static final Pattern CTOR;
 
-    /** */
+    /** デストラクタのパターンです。 */
     public static final Pattern DTOR;
 
-    /** */
+    /** 演算子のパターンです。 */
     public static final Pattern OPERATOR;
 
-    /** */
+    /** 匿名名前空間のパターンです。 */
     public static final Pattern ANONYMOUS_NS;
 
-    /** */
+    /** 置換文字列のシーケンスIDのパターンです。 */
     public static final Pattern SEQ_ID;
 
     static {
@@ -41,6 +42,7 @@ public final class RE {
     }
 
     /**
+       コンストラクタは使用できません。
     */
     private RE() {
     }

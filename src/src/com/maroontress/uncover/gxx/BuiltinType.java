@@ -4,9 +4,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+   組み込みの型名です。
 */
 public final class BuiltinType {
-    /** */
+    /** 文字と組み込みの型名のマップです。 */
     private static Map<Character, String> map;
 
     static {
@@ -35,11 +36,18 @@ public final class BuiltinType {
     }
 
     /**
+       コンストラクタは使用できません。
     */
     private BuiltinType() {
     }
 
     /**
+       文字に対応する組み込みの型名を取得します。
+
+       対応する型名が存在しない場合はnullを返します。
+
+       @param key 文字
+       @return 型名、またはnull
     */
     public static String getName(final char key) {
 	return map.get(key);

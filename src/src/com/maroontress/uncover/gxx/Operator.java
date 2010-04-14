@@ -4,9 +4,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+   演算子コンポーネントです。
 */
 public final class Operator extends Component {
-    /** */
+    /** 文字列と演算子のマップです。 */
     private static Map<String, String> map;
 
     static {
@@ -63,37 +64,41 @@ public final class Operator extends Component {
     }
 
     /**
-    */
-    public static String getName(final String key) {
-	return map.get(key);
-    }
+       オペレータを生成します。
 
-    /**
+       @param key オペレータを表す文字列
+       @return オペレータ
     */
     public static Operator create(final String key) {
 	return new Operator(key);
     }
 
-    /** */
+    /** 演算子名です。 */
     private String name;
 
     /**
+       インスタンスを生成します。
+
+       @param key オペレータを表す文字列
     */
     private Operator(final String key) {
-	name = getName(key);
+	name = map.get(key);
 	if (name == null) {
 	    throw new IllegalArgumentException("unknown name: " + key);
 	}
     }
 
     /**
+       演算子の名前の前に空白が必要かどうかを取得します。
+
+       @return 文字列 "operator" と演算子名の間にスペースが必要なら
+       true
     */
     private boolean needsSpace() {
 	return Character.isLowerCase(name.charAt(0));
     }
 
-    /**
-    */
+    /** {@inheritDoc} */
     @Override public void export(final Exporter b) {
 	b.append("operator");
 	if (needsSpace()) {

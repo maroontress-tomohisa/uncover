@@ -4,18 +4,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+   ネームスペースで表される名前です。
 */
 public final class Composite extends Exportable {
     /** */
     private List<Component> componentList;
 
     /**
+       インスタンスを生成します。
     */
     private Composite() {
 	componentList = new ArrayList<Component>();
     }
 
-    /** */
+    /** {@inheritDoc} */
     @Override public void export(final Exporter b) {
 	Component c;
 
@@ -31,15 +33,22 @@ public final class Composite extends Exportable {
     }
 
     /**
+       コンポーネントを追加します。
+
+       @param comp コンポーネント
     */
     private void add(final Component comp) {
 	componentList.add(comp);
     }
 
     /**
-       unqualified-nameから始まるコンテキストでCompositeを生成します。
+       unqualified-nameから始まるコンテキストでコンポジットを生成しま
+       す。
 
        トップレベルから呼び出されます。
+
+       @param context コンテキスト
+       @return コンポジット
     */
     public static Composite newUnqualifiedName(final Context context) {
 	Composite c = new Composite();
@@ -48,13 +57,16 @@ public final class Composite extends Exportable {
     }
 
     /**
-       qualified-substitutionから始まるコンテキストでCompositeを生成し
-       ます。
+       qualified-substitutionから始まるコンテキストでコンポジットを生
+       成します。
 
-       直前の文字はSでした。substitionが続きます。
+       直前の文字はSでした。置換文字列が続きます。
 
        トップレベルから呼び出されるので、パース後のテンプレート引数は
        無視します。
+
+       @param context コンテキスト
+       @return コンポジット
     */
     public static Composite newQualifiedSubstitution(final Context context) {
 	final Composite c = new Composite();
@@ -77,12 +89,15 @@ public final class Composite extends Exportable {
     }
 
     /**
-       prefixから始まるコンテキストでCompositeを生成します。
+       prefixから始まるコンテキストでコンポジットを生成します。
 
        直前にはN {qualifiers}*がありました。{prefix}が複数続き、Eで終
        端します。
 
        トップレベルから呼び出されます。
+
+       @param context コンテキスト
+       @return コンポジット
     */
     public static Composite newQualifiedName(final Context context) {
 	Composite c = new Composite();
@@ -98,11 +113,14 @@ public final class Composite extends Exportable {
     }
 
     /**
-       standard-prefixから始まるコンテキストでCompositeを生成します。
+       standard-prefixから始まるコンテキストでコンポジットを生成します。
 
        直前にはS[absiod]{template-args}*がありました。
 
        トップレベルからは呼び出されません。
+
+       @param prefix std::に続くコンポーネント
+       @return コンポジット
     */
     public static Composite newStandardPrefix(final Component prefix) {
 	Composite c = new Composite();
@@ -112,12 +130,17 @@ public final class Composite extends Exportable {
     }
 
     /**
-       templateから始まるコンテキストでCompositeを生成します。
+       templateから始まるコンテキストでコンポジットを生成します。
 
        直前にはStがありました。{unqualified-name} {template-args}*が続
        きます。
 
+       コンテキストはテンプレート（引数を含む）分だけ進みます。
+
        トップレベルからは呼び出されません。
+
+       @param context コンテキスト
+       @return コンポジット
     */
     public static Composite newSubstitutionTemplate(final Context context) {
 	Composite c = new Composite();
@@ -126,6 +149,11 @@ public final class Composite extends Exportable {
     }
 
     /**
+       標準テンプレートをパースします。
+
+       コンテキストはテンプレート（引数を含む）分だけ進みます。
+
+       @param context コンテキスト
     */
     private void parseSubstitutionTemplate(final Context context) {
 	TemplatedComponent sub = TemplatedComponent.create(context);
@@ -140,6 +168,12 @@ public final class Composite extends Exportable {
     }
 
     /**
+       置換文字列をパースします。
+
+       コンテキストの直前の文字はSでした。Substitution.parse()を使用し
+       てコンポジットを作成します。
+
+       @param context コンテキスト
     */
     private void parseSubstitution(final Context context) {
 	Substitution.parse(context, new SubstitutionListener() {
@@ -152,7 +186,7 @@ public final class Composite extends Exportable {
 		add(sub);
 	    }
 	    public void substitutionFound(final Exportable e) {
-		add(Component.create(e));
+		add(TemplatedComponent.create(e.toString()));
 	    }
 	});
     }

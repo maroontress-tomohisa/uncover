@@ -2,6 +2,7 @@ package com.maroontress.uncover.gxx;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
 
 /**
    ネームスペースで表される名前です。
@@ -42,6 +43,13 @@ public final class Composite extends Exportable {
     }
 
     /**
+       @param comp コンポーネント
+    */
+    private void setLast(final Component comp) {
+	componentList.set(componentList.size() - 1, comp);
+    }
+
+    /**
        unqualified-nameから始まるコンテキストでコンポジットを生成しま
        す。
 
@@ -52,7 +60,12 @@ public final class Composite extends Exportable {
     */
     public static Composite newUnqualifiedName(final Context context) {
 	Composite c = new Composite();
-	c.add(Component.create(context));
+	Component e = Component.create(context);
+	if (context.startsWith('I')) {
+	    context.addSubstitution(e);
+	    e = new TemplatedComponent(e, context);
+	}
+	c.add(e);
 	return c;
     }
 
@@ -62,9 +75,6 @@ public final class Composite extends Exportable {
 
        直前の文字はSでした。置換文字列が続きます。
 
-       トップレベルから呼び出されるので、パース後のテンプレート引数は
-       無視します。
-
        @param context コンテキスト
        @return コンポジット
     */
@@ -72,11 +82,17 @@ public final class Composite extends Exportable {
 	final Composite c = new Composite();
 	Substitution.parse(context, new SubstitutionListener() {
 	    public void templeateFound(final Context context) {
+		Component e = Component.create(context);
 		c.add(Component.STD);
-		c.add(Component.create(context));
+		c.add(e);
+		if (context.startsWith('I')) {
+		    context.addSubstitution(c);
+		    e = new TemplatedComponent(e, context);
+		    c.setLast(e);
+		}
 	    }
 	    public void standardPrefixFound(final Context context,
-					    final TemplatedComponent sub) {
+					    final Composite sub) {
 		// トップレベルの場合はここにはこない
 		throw new RuntimeException("invalid substitution");
 	    }
@@ -105,8 +121,15 @@ public final class Composite extends Exportable {
 	    if (context.startsWith('S')) {
 		c.parseSubstitution(context);
 	    } else {
-		c.add(Component.create(context));
-		context.addSubstitution(c);
+		Component e = Component.create(context);
+		c.add(e);
+		if (context.peekChar() != 'E') {
+		    context.addSubstitution(c);
+		}
+		if (context.startsWith('I')) {
+		    e = new TemplatedComponent(e, context);
+		    c.setLast(e);
+		}
 	    }
 	} while (!context.startsWith('E'));
 	return c;
@@ -156,14 +179,23 @@ public final class Composite extends Exportable {
        @param context コンテキスト
     */
     private void parseSubstitutionTemplate(final Context context) {
-	TemplatedComponent sub = TemplatedComponent.create(context);
-	add(Component.STD);
-	add(sub);
-	context.addSubstitution(this);
-	if (!context.startsWith('I')) {
+	Matcher m;
+
+	if ((m = context.matches(RE.NUMBER)) == null) {
 	    throw new IllegalArgumentException("can't demangle: " + context);
 	}
-	sub.parseTemplateArgument(context);
+	int len = Integer.parseInt(m.group());
+	Component sub = new SourceName(context.getSequence(len));
+	if (!context.startsWith('I')) {
+	    add(Component.STD);
+	    add(sub);
+	    return;
+	}
+	context.addSubstitution(newStandardPrefix(sub));
+
+	sub = new TemplatedComponent(sub, context);
+	add(Component.STD);
+	add(sub);
 	context.addSubstitution(this);
     }
 
@@ -181,12 +213,11 @@ public final class Composite extends Exportable {
 		parseSubstitutionTemplate(context);
 	    }
 	    public void standardPrefixFound(final Context context,
-					    final TemplatedComponent sub) {
-		add(Component.STD);
-		add(sub);
+					    final Composite prefix) {
+		componentList.addAll(prefix.componentList);
 	    }
 	    public void substitutionFound(final Exportable e) {
-		add(TemplatedComponent.create(e.toString()));
+		add(new SourceName(e.toString()));
 	    }
 	});
     }

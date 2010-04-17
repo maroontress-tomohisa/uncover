@@ -17,13 +17,13 @@ public interface SubstitutionListener {
     /**
        標準接頭辞を発見したことを通知します。
 
-       直前の文字は[absiod]でした。場合によっては、さらにその後に
-       I{template-args}Eが続きます。
+       コンテキストは標準接頭辞の分進みます。テンプレート引数が続く場
+       合は、それも含めて進みます。
 
        @param context コンテキスト
-       @param sub std::の次にくる名前空間の成分
+       @param prefix std::で始まる名前
     */
-    void standardPrefixFound(Context context, TemplatedComponent sub);
+    void standardPrefixFound(Context context, Composite prefix);
 
     /**
        置換文字列の参照を発見したことを通知します。

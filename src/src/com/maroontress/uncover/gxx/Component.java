@@ -7,11 +7,11 @@ import java.util.regex.Matcher;
 */
 public abstract class Component extends Exportable {
     /** プレフィックスstd::です。*/
-    public static final Component STD = new ConstantComponent("std");
+    public static final Component STD = new SourceName("std");
 
     /** 匿名ネームスペースのコンポーネントです。 */
-    public static final Component ANONYMOUS_NS
-        = new ConstantComponent("(anonymous namespace)");
+    public static final Component ANONYMOUS_NS = new SourceName(
+	"(anonymous namespace)");
 
     /** コンストラクタコンポーネントです。 */
     public static final Component CTOR = new Constructor();
@@ -28,6 +28,22 @@ public abstract class Component extends Exportable {
     /**
        コンポーネントを生成します。
 
+       @param context コンテキスト
+       @param num 文字列長を表す文字列
+       @return コンポーネント
+    */
+    public static Component create(final Context context, final String num) {
+	int len = Integer.parseInt(num);
+	CharSequence sub = context.getSequence(len);
+	if (RE.ANONYMOUS_NS.matcher(sub).lookingAt()) {
+	    return Component.ANONYMOUS_NS;
+	}
+	return new SourceName(sub);
+    }
+
+    /**
+       コンポーネントを生成します。
+
        コンテキストの直後には数字、コンストラクタ、デストラクタ、演算
        子のいずれかが存在します。コンテキストはコンポーネントの名前の
        分進みます。
@@ -39,12 +55,7 @@ public abstract class Component extends Exportable {
 	Matcher m;
 
 	if ((m = context.matches(RE.NUMBER)) != null) {
-	    int len = Integer.parseInt(m.group());
-	    CharSequence sub = context.getSequence(len);
-	    if (RE.ANONYMOUS_NS.matcher(sub).lookingAt()) {
-		return Component.ANONYMOUS_NS;
-	    }
-	    return TemplatedComponent.create(sub);
+	    return create(context, m.group());
 	}
 	if ((m = context.matches(RE.CTOR)) != null) {
 	    return CTOR;
@@ -53,8 +64,15 @@ public abstract class Component extends Exportable {
 	    return DTOR;
 	}
 	if ((m = context.matches(RE.OPERATOR)) != null) {
-	    return Operator.create(m.group());
+	    return Operator.create(context, m.group());
 	}
 	throw new IllegalArgumentException("can't demangle: " + context);
     }
+
+    /**
+       エクスポータに名前だけを出力します。
+
+       @param b エクスポータ
+    */
+    public abstract void exportName(Exporter b);
 }

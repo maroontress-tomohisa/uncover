@@ -52,7 +52,7 @@ public final class Context {
        @param e 置換文字列
     */
     public void addSubstitution(final Exportable e) {
-	//System.err.printf("[%d] %s%n", substitution.size(), e.toString());
+	//System.err.printf("[%d] %s%n", substitution.size(), e.toString());//
 	substitution.add(e.clone());
     }
 
@@ -141,7 +141,8 @@ public final class Context {
        @return 指定の文字の場合はtrue
     */
     public boolean startsWith(final char c) {
-	if (sequence.charAt(0) != c) {
+	if (sequence.length() == 0
+	    || sequence.charAt(0) != c) {
 	    return false;
 	}
 	advanceSequence(1);
@@ -159,5 +160,16 @@ public final class Context {
 	char c = sequence.charAt(0);
 	advanceSequence(1);
 	return c;
+    }
+
+    /**
+       コンテキストの先頭の文字を取得します。
+
+       コンテキストは進みません。
+
+       @return 文字
+    */
+    public char peekChar() {
+	return sequence.charAt(0);
     }
 }

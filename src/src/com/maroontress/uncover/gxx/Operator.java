@@ -6,7 +6,7 @@ import java.util.Map;
 /**
    演算子コンポーネントです。
 */
-public final class Operator extends Component {
+public final class Operator extends SimpleComponent {
     /** 文字列と演算子のマップです。 */
     private static Map<String, String> map;
 
@@ -66,11 +66,22 @@ public final class Operator extends Component {
     /**
        オペレータを生成します。
 
+       @param context コンテキスト
        @param key オペレータを表す文字列
        @return オペレータ
     */
-    public static Operator create(final String key) {
-	return new Operator(key);
+    public static Component create(final Context context, final String key) {
+	Component c;
+	String name = map.get(key);
+	if (name != null) {
+	    c = new Operator(name);
+	} else if (key.equals("cv")) {
+	    Type type = Type.create(context);
+	    c = new Operator(type.toString());
+	} else {
+	    throw new IllegalArgumentException("unknown name: " + key);
+	}
+	return c;
     }
 
     /** 演算子名です。 */
@@ -79,13 +90,10 @@ public final class Operator extends Component {
     /**
        インスタンスを生成します。
 
-       @param key オペレータを表す文字列
+       @param name オペレータを表す文字列
     */
-    private Operator(final String key) {
-	name = map.get(key);
-	if (name == null) {
-	    throw new IllegalArgumentException("unknown name: " + key);
-	}
+    private Operator(final String name) {
+	this.name = name;
     }
 
     /**

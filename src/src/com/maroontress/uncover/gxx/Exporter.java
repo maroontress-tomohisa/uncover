@@ -30,7 +30,7 @@ public final class Exporter {
        最終コンポーネントを出力します。
     */
     public void appendComponent() {
-	component.export(this);
+	component.exportName(this);
     }
 
     /**

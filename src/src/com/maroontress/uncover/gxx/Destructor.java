@@ -3,7 +3,7 @@ package com.maroontress.uncover.gxx;
 /**
    デストラクタコンポーネントです。
 */
-public final class Destructor extends Component {
+public final class Destructor extends SimpleComponent {
     /**
        インスタンスを生成します。
     */

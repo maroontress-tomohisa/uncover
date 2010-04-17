@@ -3,7 +3,7 @@ package com.maroontress.uncover.gxx;
 /**
    コンストラクタコンポーネントです。
 */
-public final class Constructor extends Component {
+public final class Constructor extends SimpleComponent {
     /**
        インスタンスを生成します。
     */

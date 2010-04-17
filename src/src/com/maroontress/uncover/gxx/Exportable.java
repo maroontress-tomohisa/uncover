@@ -32,6 +32,6 @@ public abstract class Exportable {
        @return 複製したインスタンス
     */
     public final Exportable clone() {
-	return TemplatedComponent.create(this.toString());
+	return new SourceName(this.toString());
     }
 }

@@ -30,11 +30,8 @@ public final class ExportableTypeName implements TypeName {
 		name = Composite.newSubstitutionTemplate(context);
 	    }
 	    public void standardPrefixFound(final Context context,
-					    final TemplatedComponent sub) {
-		if (context.startsWith('I')) {
-		    sub.parseTemplateArgument(context);
-		}
-		name = Composite.newStandardPrefix(sub);
+					    final Composite prefix) {
+		name = prefix;
 	    }
 	    public void substitutionFound(final Exportable e) {
 		name = e;

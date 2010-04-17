@@ -7,12 +7,9 @@ import java.util.regex.Matcher;
 /**
    型です。
 */
-public final class Type extends Exportable {
+public abstract class Type extends Exportable {
     /** */
     private static final String CAST_BOOL = "(bool)";
-
-    /** 型の名前を表すインスタンスです。 */
-    private TypeName name;
 
     /** 型の修飾子のリストです。 */
     private List<String> qualifierList;
@@ -20,42 +17,8 @@ public final class Type extends Exportable {
     /**
        インスタンスを生成します。
     */
-    private Type() {
+    protected Type() {
 	qualifierList = new ArrayList<String>();
-    }
-
-    /**
-       文字列で型名を生成します。
-
-       @param name 型名
-    */
-    private Type(final String name) {
-	this();
-	this.name = new StringTypeName(name);
-    }
-
-    /**
-       エクスポータブルで型名を生成します。
-
-       @param name 型名
-    */
-    private Type(final Exportable name) {
-	this();
-	this.name = new ExportableTypeName(name);
-    }
-
-    /**
-       コンテキストで型名を生成します。
-
-       コンテキストは型名が始まる位置にある必要があります。
-
-       コンテキストは型名分進みます。
-
-       @param context コンテキスト
-    */
-    private Type(final Context context) {
-	this();
-	this.name = new ExportableTypeName(context);
     }
 
     /**
@@ -83,9 +46,7 @@ public final class Type extends Exportable {
 
 	if ((m = context.matches(RE.ARRAY_TYPE)) != null) {
 	    int elementNum = Integer.parseInt(m.group(1));
-	    Type type = Type.create(context);
-	    type.add("[" + elementNum + "]");
-	    return type;
+	    return new ArrayType(Type.create(context), elementNum);
 	}
 	if ((m = context.matches(RE.NUMBER)) != null) {
 	    Component e = Component.create(context, m.group());
@@ -93,14 +54,15 @@ public final class Type extends Exportable {
 		context.addSubstitution(e);
 		e = new TemplatedComponent(e, context);
 	    }
-	    Type type = new Type(e);
+	    Type type = new DefaultType(e);
 	    context.addSubstitution(type);
 	    return type;
 	}
 	if ((m = context.matches(RE.TEMPLATE_PARAM)) != null) {
+	    // ListArgumentとまとめる
 	    String num = m.group(1);
 	    int k = (num.isEmpty() ? 0 : Integer.parseInt(num));
-	    context.addSubstitution(new Type("template-param " + k));
+	    context.addSubstitution(new DefaultType("template-param " + k));
 
 	    List<Type> list = new ArrayList<Type>();
 	    do {
@@ -118,12 +80,12 @@ public final class Type extends Exportable {
 		prefix = ", ";
 	    }
 	    s += ">";
-	    return new Type(s);
+	    return new DefaultType(s);
 	}
 	char c = context.getChar();
 	String name;
 	if ((name = BuiltinType.getName(c)) != null) {
-	    return new Type(name);
+	    return new DefaultType(name);
 	}
 	if (c == 'L') {
 	    Type type = Type.create(context);
@@ -142,7 +104,7 @@ public final class Type extends Exportable {
 		s = s.substring(CAST_BOOL.length());
 		s = Boolean.toString(Integer.parseInt(s) != 0);
 	    }
-	    return new Type(s);
+	    return new DefaultType(s);
 	}
 	if (c == 'M') {
 	    Type classType = create(context);
@@ -151,15 +113,7 @@ public final class Type extends Exportable {
 	    return memberType;
 	}
 	if (c == 'F') {
-	    Type type = create(context);
-	    String s = "()(";
-	    String prefix = "";
-	    while (!context.startsWith('E')) {
-		s += prefix + Type.create(context).toString();
-		prefix = ", ";
-	    }
-	    s += ")";
-	    type.add(s);
+	    Type type = new FunctionType(context);
 	    context.addSubstitution(type);
 	    return type;
 	}
@@ -176,12 +130,12 @@ public final class Type extends Exportable {
 	    return type;
 	}
 	if (c == 'N') {
-	    Type type = new Type(Composite.newQualifiedName(context));
+	    Type type = new DefaultType(Composite.newQualifiedName(context));
 	    context.addSubstitution(type);
 	    return type;
 	}
 	if (c == 'S') {
-	    return new Type(context);
+	    return new DefaultType(context);
 	}
 	throw new IllegalArgumentException("can't demangle: " + context);
     }
@@ -205,6 +159,15 @@ public final class Type extends Exportable {
     }
 
     /**
+       修飾子をもつかどうかを取得します。
+
+       @return 修飾子をもつ場合はtrue
+    */
+    protected final boolean hasQualifiers() {
+	return !qualifierList.isEmpty();
+    }
+
+    /**
        文字がポインタまたは参照演算子を表すかどうかを取得します。
 
        @param c 文字
@@ -214,12 +177,17 @@ public final class Type extends Exportable {
 	return (c == '*' || c == '&');
     }
 
-    /** {@inheritDoc} */
-    @Override public void export(final Exporter b) {
-	name.exportName(b);
+    /**
+       修飾子を出力します。
+
+       @param b エクスポータ
+    */
+    protected final void exportQualifiers(final Exporter b) {
 	for (String q : qualifierList) {
-	    if (!isModifier(q.charAt(0))
-		|| !isModifier(b.lastChar())) {
+	    char last = b.lastChar();
+	    if (last != '('
+		&& (!isModifier(q.charAt(0))
+		    || !isModifier(last))) {
 		b.append(" ");
 	    }
 	    b.append(q);

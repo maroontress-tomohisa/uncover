@@ -14,11 +14,11 @@ public final class Substitution {
     /** 置換文字列のシーケンスIDの基数 */
     private static final int RADIX = 36;
 
-    /** */
+    /** std::stringのフルネームのテンプレート引数です。 */
     private static final String ARGS_STRING =
 	"char, std::char_traits<char>, std::allocator<char>";
 
-    /** */
+    /** std::(i|o|io)streamのフルネームのテンプレート引数です。 */
     private static final String ARGS_STREAM =
 	"char, std::char_traits<char>";
 

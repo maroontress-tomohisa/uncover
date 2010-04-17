@@ -24,11 +24,6 @@ public abstract class Exportable {
 
        clone()という名前はやめる。createCopy()とかにする。
 
-       S[0-9A-Z]*_のあとにIが続かないことが確実なら、戻り値の型名は
-       ConstantComponentの方がよいけど。
-
-       TemplatedComponentが不変ではないのが元凶。
-
        @return 複製したインスタンス
     */
     public final Exportable clone() {

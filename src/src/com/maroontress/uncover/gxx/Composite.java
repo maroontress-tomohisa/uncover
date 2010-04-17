@@ -43,6 +43,8 @@ public final class Composite extends Exportable {
     }
 
     /**
+       最後のコンポーネントを上書きで設定します。
+
        @param comp コンポーネント
     */
     private void setLast(final Component comp) {

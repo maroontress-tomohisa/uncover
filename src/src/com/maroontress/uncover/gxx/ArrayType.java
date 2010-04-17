@@ -4,10 +4,10 @@ package com.maroontress.uncover.gxx;
    配列の型です。
 */
 public final class ArrayType extends Type {
-    /** */
+    /** 配列の要素の型です。 */
     private Type elementType;
 
-    /** */
+    /** 配列の要素数です。 */
     private int elementNum;
 
     /**

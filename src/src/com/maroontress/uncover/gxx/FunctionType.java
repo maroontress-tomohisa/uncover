@@ -7,10 +7,10 @@ import java.util.List;
    関数の型です。
 */
 public final class FunctionType extends Type {
-    /** */
+    /** 戻り値の型です。 */
     private Type returnType;
 
-    /** */
+    /** 引数の型のリストです。 */
     private List<Type> argTypeList;
 
     /**

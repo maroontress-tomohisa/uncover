@@ -30,13 +30,13 @@ public final class RE {
     /** 置換文字列のシーケンスIDのパターンです。 */
     public static final Pattern SEQ_ID;
 
-    /** */
+    /** 配列型のパターンです。 */
     public static final Pattern ARRAY_TYPE;
 
-    /** */
+    /** テンプレートパラメータのパターンです。 */
     public static final Pattern TEMPLATE_PARAM;
 
-    /** */
+    /** ディスクリミネータのパターンです。 */
     public static final Pattern DISCRIMINATOR;
 
     static {

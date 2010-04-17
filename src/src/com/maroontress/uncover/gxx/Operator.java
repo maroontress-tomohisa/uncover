@@ -6,7 +6,7 @@ import java.util.Map;
 /**
    演算子コンポーネントです。
 */
-public final class Operator extends SimpleComponent {
+public final class Operator extends NonPrefixComponent {
     /** 文字列と演算子のマップです。 */
     private static Map<String, String> map;
 

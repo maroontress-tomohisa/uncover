@@ -4,9 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+   型のリストで実現したテンプレート引数です。
 */
 public final class ListArguments extends TemplateArguments {
-    /** テンプレートの引数のリストです。 */
+    /** テンプレート引数の型のリストです。 */
     private List<Type> argList;
 
     /**

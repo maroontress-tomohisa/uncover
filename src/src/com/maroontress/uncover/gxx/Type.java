@@ -8,7 +8,7 @@ import java.util.regex.Matcher;
    型です。
 */
 public abstract class Type extends Exportable {
-    /** */
+    /** boolへのキャストを表す文字列です。 */
     private static final String CAST_BOOL = "(bool)";
 
     /** 型の修飾子のリストです。 */

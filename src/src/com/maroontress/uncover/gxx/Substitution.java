@@ -57,6 +57,8 @@ public final class Substitution {
 
        @param context コンテキスト
        @param listener 置換文字列リスナ
+       @throws ContextException コンテキストに続くsubstitutionをパース
+       できなかった場合スローします。
     */
     public static void parse(final Context context,
 			     final SubstitutionListener listener) {
@@ -79,7 +81,7 @@ public final class Substitution {
 	}
 	TemplateName prefix = map.get(context.getChar());
 	if (prefix == null) {
-	    throw new IllegalArgumentException("can't demangle: " + context);
+	    throw new ContextException(context);
 	}
 	char c = context.peekChar();
 	Component sub = ((c == 'C' || c == 'D')

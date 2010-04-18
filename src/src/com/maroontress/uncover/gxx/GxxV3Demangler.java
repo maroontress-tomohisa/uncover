@@ -24,9 +24,6 @@ public final class GxxV3Demangler implements CxxDemangler {
     */
     private CharSequence global;
 
-    /** デマングル前の文字列です。 */
-    private String original;
-
     /**
        デマングルする文字列を指定して、インスタンスを生成します。
 
@@ -36,11 +33,10 @@ public final class GxxV3Demangler implements CxxDemangler {
 	qualifiers = new HashSet<String>();
 	composite = null;
 	global = null;
-	original = name;
 	context = new Context(name);
 	try {
 	    parseMangledName();
-	} catch (RuntimeException e) {
+	} catch (ContextException e) {
 	    e.printStackTrace();
 	    composite = null;
 	}
@@ -79,9 +75,9 @@ public final class GxxV3Demangler implements CxxDemangler {
     private void parseEncoding() {
 	if (context.startsWith('G')
 	    || context.startsWith('T')) {
-	    throw new RuntimeException("special name not implemented.");
+	    throw new ContextException("special name not implemented.");
 	} else if (context.startsWith('Z')) {
-	    throw new RuntimeException("local name not implemented.");
+	    throw new ContextException("local name not implemented.");
 	} else if (context.startsWith('N')) {
 	    context.parseQualifier(qualifiers);
 	    composite = Composite.newQualifiedName(context);
@@ -95,7 +91,7 @@ public final class GxxV3Demangler implements CxxDemangler {
     /** {@inheritDoc} */
     public String getName() {
 	if (composite == null) {
-	    return original;
+	    return context.getSource();
 	}
 	Exporter b = new Exporter();
 	if (global != null) {

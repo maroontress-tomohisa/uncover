@@ -79,6 +79,8 @@ public final class Composite extends Exportable {
 
        @param context コンテキスト
        @return コンポジット
+       @throws ContextException コンテキストがqualified-substitutionで
+       始まっていなかった場合スローします。
     */
     public static Composite newQualifiedSubstitution(final Context context) {
 	final Composite c = new Composite();
@@ -96,10 +98,11 @@ public final class Composite extends Exportable {
 	    public void standardPrefixFound(final Context context,
 					    final Composite sub) {
 		// トップレベルの場合はここにはこない
-		throw new RuntimeException("invalid substitution");
+		throw new ContextException(context);
 	    }
 	    public void substitutionFound(final Exportable e) {
 		// トップレベルの場合はここに来る前に例外
+		throw new ContextException(context);
 	    }
 	});
 	context.addSubstitution(c);
@@ -179,12 +182,14 @@ public final class Composite extends Exportable {
        コンテキストはテンプレート（引数を含む）分だけ進みます。
 
        @param context コンテキスト
+       @throws ContextException コンテキストが標準テンプレートで始まっ
+       ていなかった場合スローします。
     */
     private void parseSubstitutionTemplate(final Context context) {
 	Matcher m;
 
 	if ((m = context.matches(RE.NUMBER)) == null) {
-	    throw new IllegalArgumentException("can't demangle: " + context);
+	    throw new ContextException(context);
 	}
 	int len = Integer.parseInt(m.group());
 	Component sub = new SourceName(context.getSequence(len));

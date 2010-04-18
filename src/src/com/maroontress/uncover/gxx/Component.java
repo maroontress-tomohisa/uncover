@@ -28,9 +28,14 @@ public abstract class Component extends Exportable {
     /**
        コンポーネントを生成します。
 
+       コンテキストの直後にはnumが表す長さの文字列が存在します。コンテ
+       キストはnumが表す長さの分進みます。
+
        @param context コンテキスト
        @param num 文字列長を表す文字列
        @return コンポーネント
+       @throws ContextException コンテキストの終端に達した場合スローし
+       ます。
     */
     public static Component create(final Context context, final String num) {
 	int len = Integer.parseInt(num);
@@ -44,12 +49,14 @@ public abstract class Component extends Exportable {
     /**
        コンポーネントを生成します。
 
-       コンテキストの直後には数字、コンストラクタ、デストラクタ、演算
-       子のいずれかが存在します。コンテキストはコンポーネントの名前の
-       分進みます。
+       コンテキストの直後にはローカルソースネーム、数字、コンストラク
+       タ、デストラクタ、演算子のいずれかが存在します。コンテキストは
+       コンポーネントの名前の分進みます。
 
        @param context コンテキスト
        @return コンポーネント
+       @throws ContextException コンテキストがコンポーネントで始まって
+       いなかった場合スローします。
     */
     public static Component create(final Context context) {
 	Matcher m;
@@ -71,7 +78,7 @@ public abstract class Component extends Exportable {
 	if ((m = context.matches(RE.OPERATOR)) != null) {
 	    return Operator.create(context, m.group());
 	}
-	throw new IllegalArgumentException("can't demangle: " + context);
+	throw new ContextException(context);
     }
 
     /**

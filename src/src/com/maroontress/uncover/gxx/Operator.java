@@ -69,19 +69,19 @@ public final class Operator extends NonPrefixComponent {
        @param context コンテキスト
        @param key オペレータを表す文字列
        @return オペレータ
+       @throws ContextException 文字列に対応するオペレータを生成できな
+       かった場合スローします。
     */
     public static Component create(final Context context, final String key) {
-	Component c;
 	String name = map.get(key);
 	if (name != null) {
-	    c = new Operator(name);
-	} else if (key.equals("cv")) {
-	    Type type = Type.create(context);
-	    c = new Operator(type.toString());
-	} else {
-	    throw new IllegalArgumentException("unknown name: " + key);
+	    return new Operator(name);
 	}
-	return c;
+	if (key.equals("cv")) {
+	    Type type = Type.create(context);
+	    return new Operator(type.toString());
+	}
+	throw new ContextException(context, key);
     }
 
     /** 演算子名です。 */

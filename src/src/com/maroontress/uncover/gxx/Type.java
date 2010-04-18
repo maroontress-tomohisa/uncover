@@ -32,6 +32,8 @@ public abstract class Type extends Exportable {
 
        @param context コンテキスト
        @return 型
+       @throws ContextException コンテキストから型を生成できなかった場
+       合スローします。
     */
     public static Type create(final Context context) {
 	List<String> qualifiers = new ArrayList<String>();
@@ -137,7 +139,7 @@ public abstract class Type extends Exportable {
 	if (c == 'S') {
 	    return new DefaultType(context);
 	}
-	throw new IllegalArgumentException("can't demangle: " + context);
+	throw new ContextException(context);
     }
 
     /**

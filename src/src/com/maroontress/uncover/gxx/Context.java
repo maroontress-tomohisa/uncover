@@ -37,13 +37,22 @@ public final class Context {
     /**
        インスタンスを生成します。
 
-       @param source パースするシーケンス
+       @param source パースする文字列
     */
     public Context(final String source) {
 	this.source = source;
 	sequence = source;
 	position = 0;
 	substitution = new ArrayList<Exportable>();
+    }
+
+    /**
+       パースの対象として指定された文字列を取得します。
+
+       @return パースする文字列
+    */
+    public String getSource() {
+	return source;
     }
 
     /** {@inheritDoc} */
@@ -94,13 +103,24 @@ public final class Context {
        進みます。
 
        @param qualifiers 修飾子文字列を追加する集合
+       @throws ContextException コンテキストが終端に達していた、または
+       修飾子をパース中に終端に達した場合スローします。
     */
     public void parseQualifier(final Collection<String> qualifiers) {
+	if (sequence.length() == 0) {
+	    throw new ContextException(this);
+	}
+	int n = sequence.length();
 	int k;
 	String q;
 
-	for (k = 0; (q = qualifierMap.get(sequence.charAt(k))) != null; ++k) {
+	for (k = 0;
+	     k < n && (q = qualifierMap.get(sequence.charAt(k))) != null;
+	     ++k) {
 	    qualifiers.add(q);
+	}
+	if (k == n) {
+	    throw new ContextException(this);
 	}
 	advanceSequence(k);
     }
@@ -112,14 +132,14 @@ public final class Context {
 
        @param len 文字数
        @return シーケンス
+       @throws ContextException 終端を越える長さの文字数を指定した場合
+       スローします。
     */
     public CharSequence getSequence(final int len) {
-	CharSequence seq;
-	try {
-	    seq = sequence.subSequence(0, len);
-	} catch (IndexOutOfBoundsException e) {
-	    throw new IllegalArgumentException("can't demangle: " + this);
+	if (len > sequence.length()) {
+	    throw new ContextException(this);
 	}
+	CharSequence seq = sequence.subSequence(0, len);
 	advanceSequence(len);
 	return seq;
     }
@@ -133,8 +153,13 @@ public final class Context {
 
        @param pattern 正規表現パターン
        @return マッチャ、またはnull
+       @throws ContextException コンテキストが終端に達していた場合スロー
+       します。
     */
     public Matcher matches(final Pattern pattern) {
+	if (sequence.length() == 0) {
+	    throw new ContextException(this);
+	}
 	Matcher m = pattern.matcher(sequence);
 	if (!m.lookingAt()) {
 	    return null;
@@ -146,7 +171,9 @@ public final class Context {
     /**
        コンテキストの先頭の文字が指定の文字かどうかを取得します。
 
-       指定の文字の場合は、コンテキストは1文字分進みます。
+       指定の文字の場合は、コンテキストは1文字分進み、trueを返します。
+       そうでないか、コンテキストが終端に達していた場合は、ただfalseを
+       返します。
 
        @param c 文字
        @return 指定の文字の場合はtrue
@@ -166,8 +193,13 @@ public final class Context {
        コンテキストは1文字分進みます。
 
        @return 文字
+       @throws ContextException コンテキストが終端に達していた場合スロー
+       します。
     */
     public char getChar() {
+	if (sequence.length() == 0) {
+	    throw new ContextException(this);
+	}
 	char c = sequence.charAt(0);
 	advanceSequence(1);
 	return c;
@@ -179,18 +211,25 @@ public final class Context {
        コンテキストは進みません。
 
        @return 文字
+       @throws ContextException コンテキストが終端に達していた場合スロー
+       します。
     */
     public char peekChar() {
+	if (sequence.length() == 0) {
+	    throw new ContextException(this);
+	}
 	return sequence.charAt(0);
     }
 
     /**
        ディスクリミネータをスキップします。
+
+       @throws ContextException ディスクリミネータが存在し、それが不正
+       な場合スローします。
     */
     public void skipDiscriminator() {
-	if (!startsWith('_') || matches(RE.NUMBER) != null) {
-	    return;
+	if (startsWith('_') && matches(RE.NUMBER) == null) {
+	    throw new ContextException(this);
 	}
-	throw new IllegalArgumentException("can't demangle: " + this);
     }
 }

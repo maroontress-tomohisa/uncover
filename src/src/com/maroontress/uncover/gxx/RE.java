@@ -36,8 +36,8 @@ public final class RE {
     /** テンプレートパラメータのパターンです。 */
     public static final Pattern TEMPLATE_PARAM;
 
-    /** ディスクリミネータのパターンです。 */
-    public static final Pattern DISCRIMINATOR;
+    /** ローカルソースネーム開始のパターンです。 */
+    public static final Pattern LOCAL_SOURCE_NAME;
 
     static {
 	NUMBER = Pattern.compile("[1-9][0-9]*");
@@ -50,7 +50,7 @@ public final class RE {
 	SEQ_ID = Pattern.compile("([0-9A-Z]*)_");
 	ARRAY_TYPE = Pattern.compile("A([1-9][0-9]*)_");
 	TEMPLATE_PARAM = Pattern.compile("T([0-9]*)_I");
-	DISCRIMINATOR = Pattern.compile("_[0-9]+");
+	LOCAL_SOURCE_NAME = Pattern.compile("L([1-9][0-9]*)");
     }
 
     /**

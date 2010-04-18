@@ -22,8 +22,14 @@ public final class Context {
 	qualifierMap.put('V', "volatile");
     }
 
+    /** オリジナルのシーケンスです。 */
+    private String source;
+
     /** パース対象のシーケンスです。 */
     private CharSequence sequence;
+
+    /** オリジナルに対してシーケンスが始まる位置です。 */
+    private int position;
 
     /** 置換文字列のリストです。 */
     private List<Exportable> substitution;
@@ -31,16 +37,20 @@ public final class Context {
     /**
        インスタンスを生成します。
 
-       @param sequence パースするシーケンス
+       @param source パースするシーケンス
     */
-    public Context(final String sequence) {
-	this.sequence = sequence;
+    public Context(final String source) {
+	this.source = source;
+	sequence = source;
+	position = 0;
 	substitution = new ArrayList<Exportable>();
     }
 
     /** {@inheritDoc} */
     public String toString() {
-	return sequence.toString();
+	return sequence.toString()
+	    + ":" + position
+	    + ":" + sequence.subSequence(position, sequence.length());
     }
 
     /**
@@ -67,12 +77,13 @@ public final class Context {
     }
 
     /**
-       パース位置を進めます。
+       パース位置を進めてシーケンスを更新します。
 
        @param k パース位置を進める文字数
     */
     private void advanceSequence(final int k) {
 	sequence = sequence.subSequence(k, sequence.length());
+	position += k;
     }
 
     /**
@@ -107,7 +118,7 @@ public final class Context {
 	try {
 	    seq = sequence.subSequence(0, len);
 	} catch (IndexOutOfBoundsException e) {
-	    throw new IllegalArgumentException("can't demangle: " + this, e);
+	    throw new IllegalArgumentException("can't demangle: " + this);
 	}
 	advanceSequence(len);
 	return seq;
@@ -171,5 +182,15 @@ public final class Context {
     */
     public char peekChar() {
 	return sequence.charAt(0);
+    }
+
+    /**
+       ディスクリミネータをスキップします。
+    */
+    public void skipDiscriminator() {
+	if (!startsWith('_') || matches(RE.NUMBER) != null) {
+	    return;
+	}
+	throw new IllegalArgumentException("can't demangle: " + this);
     }
 }

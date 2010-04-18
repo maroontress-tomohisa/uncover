@@ -54,6 +54,11 @@ public abstract class Component extends Exportable {
     public static Component create(final Context context) {
 	Matcher m;
 
+	if ((m = context.matches(RE.LOCAL_SOURCE_NAME)) != null) {
+	    Component c = create(context, m.group(1));
+	    context.skipDiscriminator();
+	    return c;
+	}
 	if ((m = context.matches(RE.NUMBER)) != null) {
 	    return create(context, m.group());
 	}

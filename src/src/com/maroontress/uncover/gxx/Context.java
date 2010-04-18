@@ -5,6 +5,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -15,11 +17,15 @@ public final class Context {
     /** 修飾子のマップです。 */
     private static Map<Character, String> qualifierMap;
 
+    /** コンテキストのロガーです。 */
+    private static Logger logger;
+
     static {
 	qualifierMap = new HashMap<Character, String>();
 	qualifierMap.put('r', "restrict");
 	qualifierMap.put('K', "const");
 	qualifierMap.put('V', "volatile");
+	logger = Logger.getLogger(Context.class.getPackage().getName());
     }
 
     /** オリジナルのシーケンスです。 */
@@ -71,8 +77,11 @@ public final class Context {
        @param e 置換文字列
     */
     public void addSubstitution(final Exportable e) {
-	//System.err.printf("[%d] %s%n", substitution.size(), e.toString());//
-	substitution.add(e.clone());
+	if (logger.isLoggable(Level.INFO)) {
+	    logger.info(String.format("[%d] %s",
+				      substitution.size(), e.toString()));
+	}
+	substitution.add(e.createCopy());
     }
 
     /**

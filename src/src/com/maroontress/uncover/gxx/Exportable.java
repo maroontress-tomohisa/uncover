@@ -5,6 +5,7 @@ package com.maroontress.uncover.gxx;
    を提供します。
 */
 public abstract class Exportable {
+
     /** {@inheritDoc} */
     public final String toString() {
 	Exporter b = new Exporter();
@@ -20,13 +21,16 @@ public abstract class Exportable {
     public abstract void export(Exporter b);
 
     /**
-       インスタンスを複製します。
+       インスタンスのコピーを生成します。
 
-       clone()という名前はやめる。createCopy()とかにする。
-
-       @return 複製したインスタンス
+       @return インスタンスのコピー
     */
-    public final Exportable clone() {
-	return new SourceName(this.toString());
+    public final Exportable createCopy() {
+	/*
+	  積極的にObject.clone()を使いたいわけではない。Checkstyleの
+	  DesignForExtensionを満たすのも難しい。このケースではclone()
+	  の戻り値を実際のクラスにキャストする必要もない。
+	*/
+	return new SourceName(toString());
     }
 }

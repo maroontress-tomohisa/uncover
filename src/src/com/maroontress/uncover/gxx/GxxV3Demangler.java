@@ -3,12 +3,24 @@ package com.maroontress.uncover.gxx;
 import com.maroontress.uncover.CxxDemangler;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 
 /**
    g++v3のデマングルパーサです。
 */
 public final class GxxV3Demangler implements CxxDemangler {
+    /** */
+    private static Logger logger;
+
+    static {
+	String name = GxxV3Demangler.class.getPackage().getName();
+	logger = Logger.getLogger(name);
+	logger.setUseParentHandlers(false);
+	logger.setLevel(Level.OFF);
+    }
+
     /** パーサのコンテキストです。 */
     private Context context;
 
@@ -37,7 +49,9 @@ public final class GxxV3Demangler implements CxxDemangler {
 	try {
 	    parseMangledName();
 	} catch (ContextException e) {
-	    e.printStackTrace();
+	    if (logger.isLoggable(Level.INFO)) {
+		logger.log(Level.INFO, getClass().getName(), e);
+	    }
 	    composite = null;
 	}
     }

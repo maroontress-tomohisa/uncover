@@ -88,7 +88,7 @@ public abstract class FunctionPairPrinter {
         out.printf("<h3>%s</h3>\n", title);
         FunctionPair[] array = select(pairList);
         if (array.length == 0) {
-            out.println("<p>None</p>");
+            out.print("<p>None</p>\n");
             return;
         }
         out.printf("<p>%d/%d function(s) found.</p>\n",
@@ -96,9 +96,9 @@ public abstract class FunctionPairPrinter {
         Arrays.sort(array, comparator);
         out.print("<table border=\"1\">\n"
 		  + "<tbody>\n");
-        out.println(header);
+        out.printf("%s\n", header);
         for (FunctionPair pair : array) {
-            out.println(getRow(pair));
+            out.printf("%s\n", getRow(pair));
         }
         out.print("</tbody>\n"
 		  + "</table>\n");

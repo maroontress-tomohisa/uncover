@@ -96,11 +96,11 @@ public final class RevisionPair {
                                    + " %");
         }
         s = "<th colspan=\"" + cols + "\">Number of Functions</th>";
-        out.println(Table.row(s));
+        out.printf("%s\n", Table.row(s));
         s = Table.dataR("(" + prevNum + ")" + Text.trendArrow(prevNum, num))
             + Table.dataR("" + num)
             + deltaNum;
-        out.println(Table.row(s));
+        out.printf("%s\n", Table.row(s));
         out.print("</tbody>\n"
 		  + "</table>\n");
     }
@@ -115,10 +115,10 @@ public final class RevisionPair {
 				   final List<Function> deltaList) {
         int n = deltaList.size();
         if (n == 0) {
-            out.println("<p>None</p>");
+            out.print("<p>None</p>\n");
             return;
         }
-        out.println("<p>" + n + " function(s) found.</p>");
+        out.print("<p>" + n + " function(s) found.</p>\n");
         Function[] array = deltaList.toArray(new Function[n]);
         Arrays.sort(array, Function.COMPLEXITY_COMPARATOR);
         out.print("<table border=\"1\">\n"
@@ -129,7 +129,7 @@ public final class RevisionPair {
             + "<th>CC</th>"
             + "<th>R %</th>"
             + "<th>EB/AB</th>";
-        out.println(Table.row(h));
+        out.printf("%s\n", Table.row(h));
         for (Function function : array) {
             String s = ""
                 + Table.dataL(demangle(function.getName()))
@@ -139,7 +139,7 @@ public final class RevisionPair {
 					    CENT * function.getBlockRate()))
                 + Table.dataR("" + function.getExecutedBlocks()
                               + "/" + function.getAllBlocks());
-            out.println(Table.row(s));
+            out.printf("%s\n", Table.row(s));
         }
         out.print("</tbody>\n"
 		  + "</table>\n");
@@ -151,7 +151,7 @@ public final class RevisionPair {
        @param out 出力ストリーム
     */
     private void printAddedFunctions(final PrintStream out) {
-        out.println("<h3>Added Functions</h3>");
+        out.print("<h3>Added Functions</h3>\n");
 	printFunctionList(out, rev.createOuterFunctions(old));
     }
 
@@ -161,7 +161,7 @@ public final class RevisionPair {
        @param out 出力ストリーム
     */
     private void printRemovedFunctions(final PrintStream out) {
-        out.println("<h3>Removed Functions</h3>");
+        out.print("<h3>Removed Functions</h3>\n");
 	printFunctionList(out, old.createOuterFunctions(rev));
     }
 
@@ -355,7 +355,7 @@ public final class RevisionPair {
             + "<th colspan=\"2\">CC</th>"
             + "<th>R %</th>"
             + "<th>EB/AB</th>";
-        out.println(Table.row(h));
+        out.printf("%s\n", Table.row(h));
 
 	for (Function function : array) {
             String key = function.getKey();
@@ -377,7 +377,7 @@ public final class RevisionPair {
             String row = Table.row(rowComplexityRanking(function, rank,
 							rankTrend,
 							complexityTrend));
-	    out.println(row);
+	    out.printf("%s\n", row);
         }
         out.print("</tbody>\n"
 		  + "</table>\n");

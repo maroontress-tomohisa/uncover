@@ -11,8 +11,8 @@ import com.maroontress.uncover.Graph;
 import com.maroontress.uncover.GraphSource;
 import com.maroontress.uncover.Revision;
 import com.maroontress.uncover.Toolkit;
+import java.net.URL;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -40,16 +40,8 @@ public final class SQLiteDB implements DB {
        きにスローします。
     */
     public SQLiteDB(final String subname) throws DBException {
-	try {
-	    Class.forName("org.sqlite.JDBC");
-	    con = DriverManager.getConnection(URL + subname);
-	} catch (ClassNotFoundException e) {
-	    throw new DBException("sqlite JDBC driver not found: "
-				  + e.getMessage(), e);
-	} catch (SQLException e) {
-	    throw new DBException("can't get connection: "
-				  + e.getMessage(), e);
-	}
+	con = ConnectionFactory.createConnection("org.sqlite.JDBC",
+						 URL + subname);
 	try {
 	    con.setAutoCommit(false);
 	} catch (SQLException e) {

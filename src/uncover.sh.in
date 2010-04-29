@@ -1,8 +1,11 @@
 #!/bin/sh
 
-JVM_OPTIONS="-Xmx256m"
-if [ "${UNCOVER_CLASSPATH}" != "" ] ; then
-    JVM_OPTIONS="${JVM_OPTIONS} -Djava.ext.dirs=${UNCOVER_CLASSPATH}"
+o="-Xmx256m"
+if [ "${UNCOVER_EXT_DIRS}" != "" ] ; then
+    o="$o -Dcom.maroontress.uncover.ext.dirs=${UNCOVER_EXT_DIRS}"
+fi
+if [ "${UNCOVER_JVM_OPTIONS}" != "" ] ; then
+    o="$o ${UNCOVER_JVM_OPTIONS}"
 fi
 
-exec java ${JVM_OPTIONS} -jar @PREFIX@/lib/uncover/uncover.jar "$@"
+exec java $o -jar @PREFIX@/lib/uncover/uncover.jar "$@"

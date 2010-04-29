@@ -5,7 +5,7 @@
   <property name="javadoc_linkurl" value="http://java.sun.com/javase/ja/6/docs/ja/api/"/>
   <property name="javac_options" value="-encoding EUC-JP -Xlint:unchecked -Xlint:deprecation"/>
 
-  <target name="all" depends="uncover.jar"/>
+  <target name="all" depends="uncover.jar, jdbcskirt.jar"/>
 
   <target name="destdir">
     <mkdir dir="classes"/>
@@ -25,16 +25,25 @@
   </target>
 
   <target name="uncover.jar" depends="resources">
-    <jar destfile="uncover.jar" manifest="manifest" basedir="classes"/>
+    <jar destfile="uncover.jar" manifest="manifest">
+      <fileset dir="classes" includes="**/*" excludes="com/maroontress/jdbcskirt/**"/>
+    </jar>
   </target>
 
-  <target name="install" depends="uncover.jar">
+  <target name="jdbcskirt.jar">
+    <jar destfile="jdbcskirt.jar">
+      <fileset dir="classes" includes="com/maroontress/jdbcskirt/**"/>
+    </jar>
+  </target>
+
+  <target name="install" depends="uncover.jar, jdbcskirt.jar">
     <copy file="uncover.sh.in" tofile="uncover.sh" overwrite="true">
       <filterset>
         <filter token="PREFIX" value="${prefix}"/>
       </filterset>
     </copy>
     <copy file="uncover.jar" todir="${prefix}/lib/uncover" overwrite="true"/>
+    <copy file="jdbcskirt.jar" todir="${prefix}/lib/uncover" overwrite="true"/>
     <exec dir="." executable="install" failonerror="true">
       <arg line="-d -m 0755 ${prefix}/bin"/>
     </exec>
@@ -57,7 +66,7 @@
 
   <target name="clean">
     <delete>
-      <fileset dir="." includes="uncover.jar uncover.sh"/>
+      <fileset dir="." includes="uncover.jar jdbcskirt.jar uncover.sh"/>
     </delete>
     <delete dir="html"/>
     <delete dir="classes"/>

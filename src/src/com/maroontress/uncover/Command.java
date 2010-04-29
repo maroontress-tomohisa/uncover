@@ -115,7 +115,7 @@ public abstract class Command {
 	    } else {
 		handleException(e);
 	    }
-	    System.exit(1);
+	    Toolkit.getInstance().exit(1);
 	}
     }
 
@@ -169,7 +169,7 @@ public abstract class Command {
     */
     protected final void usage() {
 	printUsage(System.err);
-        System.exit(1);
+        Toolkit.getInstance().exit(1);
     }
 
     /**

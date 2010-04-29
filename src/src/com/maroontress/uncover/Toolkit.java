@@ -36,6 +36,13 @@ public abstract class Toolkit {
     }
 
     /**
+      プログラムを終了します。
+
+      @param status 終了ステータスコード
+    */
+    public abstract void exit(int status);
+
+    /**
        DBインスタンスを生成します。
 
        @param subname JDBCの接続URLのサブネーム

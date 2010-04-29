@@ -15,6 +15,13 @@ public final class DefaultToolkit extends Toolkit {
     /**
        {@inheritDoc}
     */
+    public void exit(final int status) {
+	System.exit(status);
+    }
+
+    /**
+       {@inheritDoc}
+    */
     public DB createDB(final String subname) throws DBException {
 	return new SQLiteDB(subname);
     }

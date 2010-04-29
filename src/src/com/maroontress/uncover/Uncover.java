@@ -92,7 +92,7 @@ public final class Uncover {
     */
     private void run() {
 	command.run();
-	System.exit(0);
+	Toolkit.getInstance().exit(0);
     }
 
     /**
@@ -119,7 +119,7 @@ public final class Uncover {
     */
     private void usage() {
 	printUsage(System.err);
-        System.exit(1);
+        Toolkit.getInstance().exit(1);
     }
 
     /**
@@ -137,7 +137,7 @@ public final class Uncover {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        System.exit(1);
+        Toolkit.getInstance().exit(1);
     }
 
     /**
@@ -148,6 +148,6 @@ public final class Uncover {
     public static void main(final String[] av) {
 	Uncover uncover = new Uncover(av);
 	uncover.run();
-        System.exit(0);
+        Toolkit.getInstance().exit(0);
     }
 }

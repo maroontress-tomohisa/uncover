@@ -72,18 +72,17 @@ public final class Uncover {
 	    System.err.println("command not specified.");
 	    usage();
 	}
-	if (props.getDBFile() == null) {
-	    System.err.println("database file not specified.");
-	    usage();
-	}
 
 	String name = args[0];
 	args = Arrays.copyOfRange(args, 1, args.length);
-
 	command = bank.createCommand(name, props, args);
-
 	if (command == null) {
 	    System.err.println("unknown command: " + name);
+	    usage();
+	}
+
+	if (props.getDBFile() == null) {
+	    System.err.println("database file not specified.");
 	    usage();
 	}
     }

@@ -86,6 +86,10 @@ public final class CommitCommand extends Command {
 	    System.err.println("--revision=ARG must be specified.");
 	    usage();
 	}
+	if (revision.startsWith("@")) {
+	    System.err.println("revision can't start with '@': " + revision);
+	    usage();
+	}
 	if (timestamp == null) {
 	    Calendar cal = Calendar.getInstance();
 	    timestamp = String.format("%04d-%02d-%02d %02d:%02d:%02d",

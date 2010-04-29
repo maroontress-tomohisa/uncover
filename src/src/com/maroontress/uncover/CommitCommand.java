@@ -2,8 +2,6 @@ package com.maroontress.uncover;
 
 import com.maroontress.cui.OptionListener;
 import com.maroontress.cui.Options;
-import com.maroontress.uncover.coverture.Parser;
-import com.maroontress.uncover.coverture.ParsingException;
 import java.util.Calendar;
 
 /**
@@ -114,7 +112,7 @@ public final class CommitCommand extends Command {
     */
     protected void run(final DB db) throws CommandException {
 	try {
-	    final Parser parser = new Parser(xmlFile);
+	    final Parser parser = Toolkit.getInstance().createParser(xmlFile);
 	    db.commit(new CommitSource() {
 		public String getProjectName() {
 		return projectName;

@@ -1,6 +1,8 @@
 package com.maroontress.uncover.coverture;
 
 import com.maroontress.uncover.FunctionGraph;
+import com.maroontress.uncover.Parser;
+import com.maroontress.uncover.ParsingException;
 import java.io.File;
 import java.util.Iterator;
 import javax.xml.parsers.DocumentBuilder;
@@ -15,7 +17,7 @@ import org.xml.sax.SAXParseException;
 /**
    Covertureの出力ファイルを解釈するパーサです。
 */
-public final class Parser implements Iterable<FunctionGraph> {
+public final class CovertureParser implements Parser {
     /**
        Covertureの出力ファイルのパスからドキュメントを生成します。
 
@@ -62,7 +64,7 @@ public final class Parser implements Iterable<FunctionGraph> {
        @param xmlFile Covertureの出力ファイルのパス
        @throws ParsingException パースに失敗したときにスローします。
     */
-    public Parser(final String xmlFile) throws ParsingException {
+    public CovertureParser(final String xmlFile) throws ParsingException {
         Document doc = createDocument(xmlFile);
         Element root = doc.getDocumentElement();
         if (!root.getNodeName().equals("gcno")) {
@@ -75,11 +77,7 @@ public final class Parser implements Iterable<FunctionGraph> {
         }
     }
 
-    /**
-       関数グラフイテレータを取得します。
-
-       @return 関数グラフイテレータ
-    */
+    /** {@inheritDoc} */
     public Iterator<FunctionGraph> iterator() {
 	return new FunctionGraphIterator(allFunctions);
     }

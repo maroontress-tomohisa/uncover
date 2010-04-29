@@ -43,6 +43,17 @@ public abstract class Toolkit {
     public abstract void exit(int status);
 
     /**
+       関数グラフのイテレータファクトリを生成します。
+
+       @param file 入力となるファイル
+       @return 関数グラフのイテレータファクトリ
+       @throws ParsingException ファイルのパースでエラーが発生したとき
+       にスローします。
+    */
+    public abstract Parser createParser(final String file)
+	throws ParsingException;
+
+    /**
        DBインスタンスを生成します。
 
        @param subname JDBCの接続URLのサブネーム

@@ -1,7 +1,7 @@
-package com.maroontress.uncover.coverture;
+package com.maroontress.uncover;
 
 /**
-   Covertureの生成したXMLのパースに関する例外です。
+   関数グラフの入力となるファイルのパース処理に関する例外です。
 */
 public class ParsingException extends Exception {
     /**

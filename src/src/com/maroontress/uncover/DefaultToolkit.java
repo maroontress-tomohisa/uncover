@@ -1,5 +1,6 @@
 package com.maroontress.uncover;
 
+import com.maroontress.uncover.coverture.CovertureParser;
 import com.maroontress.uncover.sqlite.SQLiteDB;
 
 /**
@@ -17,6 +18,13 @@ public final class DefaultToolkit extends Toolkit {
     */
     public void exit(final int status) {
 	System.exit(status);
+    }
+
+    /**
+       {@inheritDoc}
+    */
+    public Parser createParser(final String file) throws ParsingException {
+	return new CovertureParser(file);
     }
 
     /**

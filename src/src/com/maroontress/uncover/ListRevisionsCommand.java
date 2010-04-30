@@ -6,7 +6,7 @@ import com.maroontress.cui.Options;
 /**
    list-revisionsコマンドです。
 */
-public final class ListRevisionsCommand extends Command {
+public final class ListRevisionsCommand extends DBCommand {
     /** コマンド名です。 */
     public static final String NAME = "list-revisions";
 

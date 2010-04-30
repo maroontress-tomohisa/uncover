@@ -57,6 +57,10 @@ public final class CommandBank {
 	    command = clazz.getConstructor(Properties.class, String[].class)
 		.newInstance(props, args);
 	} catch (InvocationTargetException e) {
+	    Throwable cause = e.getCause();
+	    if (cause != null && cause instanceof RuntimeException) {
+		throw (RuntimeException) cause;
+	    }
 	    e.printStackTrace();
 	} catch (IllegalAccessException e) {
 	    e.printStackTrace();

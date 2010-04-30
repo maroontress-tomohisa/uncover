@@ -7,7 +7,7 @@ import java.util.Calendar;
 /**
    commitコマンドです。
 */
-public final class CommitCommand extends Command {
+public final class CommitCommand extends DBCommand {
     /** コマンド名です。 */
     public static final String NAME = "commit";
 

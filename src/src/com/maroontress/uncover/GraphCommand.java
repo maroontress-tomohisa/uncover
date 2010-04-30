@@ -7,7 +7,7 @@ import java.io.PrintStream;
 /**
    graphコマンドです。
 */
-public final class GraphCommand extends Command {
+public final class GraphCommand extends DBCommand {
     /** コマンド名です。 */
     public static final String NAME = "graph";
 

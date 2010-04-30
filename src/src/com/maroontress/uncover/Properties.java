@@ -1,9 +1,14 @@
 package com.maroontress.uncover;
 
+import java.util.prefs.Preferences;
+
 /**
    プロパティです。
 */
 public final class Properties {
+    /** デフォルトのデータベースファイルのキーです。 */
+    public static final String KEY_DB_DEFAULT = "db.default";
+
     /** データベースファイルのパスです。 */
     private String dbFile;
 
@@ -11,7 +16,8 @@ public final class Properties {
        デフォルトのプロパティを生成します。
     */
     public Properties() {
-	dbFile = null;
+	Preferences prefs = Preferences.userNodeForPackage(Uncover.class);
+	dbFile = prefs.get(KEY_DB_DEFAULT, null);
     }
 
     /**

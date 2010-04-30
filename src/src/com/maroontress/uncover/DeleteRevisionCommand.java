@@ -6,7 +6,7 @@ import com.maroontress.cui.Options;
 /**
    delete-revisionコマンドです。
 */
-public final class DeleteRevisionCommand extends Command {
+public final class DeleteRevisionCommand extends DBCommand {
     /** コマンド名です。 */
     public static final String NAME = "delete-revision";
 

@@ -5,7 +5,7 @@ import com.maroontress.cui.Options;
 /**
    list-projectsコマンドです。
 */
-public final class ListProjectsCommand extends Command {
+public final class ListProjectsCommand extends DBCommand {
     /** コマンド名です。 */
     public static final String NAME = "list-projects";
 

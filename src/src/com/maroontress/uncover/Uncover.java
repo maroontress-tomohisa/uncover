@@ -42,6 +42,7 @@ public final class Uncover {
 	bank.addCommandClass(DeleteRevisionCommand.class);
 	bank.addCommandClass(DeleteProjectCommand.class);
 	bank.addCommandClass(GraphCommand.class);
+	bank.addCommandClass(ConfigCommand.class);
 
 	options.add("help", new OptionListener() {
 	    public void run(final String name, final String arg) {
@@ -78,11 +79,6 @@ public final class Uncover {
 	command = bank.createCommand(name, props, args);
 	if (command == null) {
 	    System.err.println("unknown command: " + name);
-	    usage();
-	}
-
-	if (props.getDBFile() == null) {
-	    System.err.println("database file not specified.");
 	    usage();
 	}
     }

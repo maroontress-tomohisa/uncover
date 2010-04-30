@@ -3,7 +3,7 @@ package com.maroontress.uncover;
 /**
    initコマンドです。
 */
-public final class InitCommand extends Command {
+public final class InitCommand extends DBCommand {
     /** コマンド名です。 */
     public static final String NAME = "init";
 

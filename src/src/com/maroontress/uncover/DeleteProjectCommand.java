@@ -3,7 +3,7 @@ package com.maroontress.uncover;
 /**
    delete-projectコマンドです。
 */
-public final class DeleteProjectCommand extends Command {
+public final class DeleteProjectCommand extends DBCommand {
     /** コマンド名です。 */
     public static final String NAME = "delete-project";
 

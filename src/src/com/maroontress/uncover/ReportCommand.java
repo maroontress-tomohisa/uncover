@@ -6,7 +6,7 @@ import com.maroontress.cui.Options;
 /**
    reportコマンドです。
 */
-public final class ReportCommand extends Command {
+public final class ReportCommand extends DBCommand {
     /** コマンド名です。 */
     public static final String NAME = "report";
 

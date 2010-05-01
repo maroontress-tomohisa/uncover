@@ -107,9 +107,7 @@ public final class CommitCommand extends DBCommand {
 	xmlFile = args[0];
     }
 
-    /**
-       {@inheritDoc}
-    */
+    /** {@inheritDoc} */
     protected void run(final DB db) throws CommandException {
 	try {
 	    final Parser parser = Toolkit.getInstance().createParser(xmlFile);

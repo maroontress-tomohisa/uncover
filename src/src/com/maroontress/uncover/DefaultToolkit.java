@@ -13,58 +13,42 @@ public final class DefaultToolkit extends Toolkit {
     public DefaultToolkit() {
     }
 
-    /**
-       {@inheritDoc}
-    */
+    /** {@inheritDoc} */
     public void exit(final int status) {
 	System.exit(status);
     }
 
-    /**
-       {@inheritDoc}
-    */
+    /** {@inheritDoc} */
     public Parser createParser(final String file) throws ParsingException {
 	return new CovertureParser(file);
     }
 
-    /**
-       {@inheritDoc}
-    */
+    /** {@inheritDoc} */
     public DB createDB(final String subname) throws DBException {
 	return new SQLiteDB(subname);
     }
 
-    /**
-       {@inheritDoc}
-    */
+    /** {@inheritDoc} */
     public Function createFunction(final FunctionSource source) {
 	return new Function(source);
     }
 
-    /**
-       {@inheritDoc}
-    */
+    /** {@inheritDoc} */
     public Graph createGraph(final GraphSource source) {
 	return new Graph(source);
     }
 
-    /**
-       {@inheritDoc}
-    */
+    /** {@inheritDoc} */
     public Block createBlock(final BlockSource source) {
 	return new Block(source);
     }
 
-    /**
-       {@inheritDoc}
-    */
+    /** {@inheritDoc} */
     public Arc createArc(final ArcSource source) {
 	return new Arc(source);
     }
 
-    /**
-       {@inheritDoc}
-    */
+    /** {@inheritDoc} */
     public Build createBuild(final BuildSource source) {
 	return new Build(source);
     }

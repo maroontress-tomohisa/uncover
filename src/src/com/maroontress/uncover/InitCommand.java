@@ -29,9 +29,7 @@ public final class InitCommand extends DBCommand {
 	}
     }
 
-    /**
-       {@inheritDoc}
-    */
+    /** {@inheritDoc} */
     protected void run(final DB db) throws CommandException {
 	try {
 	    db.initialize();

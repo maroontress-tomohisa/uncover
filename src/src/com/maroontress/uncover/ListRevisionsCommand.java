@@ -46,9 +46,7 @@ public final class ListRevisionsCommand extends DBCommand {
 	}
     }
 
-    /**
-       {@inheritDoc}
-    */
+    /** {@inheritDoc} */
     protected void run(final DB db) throws CommandException {
 	try {
 	    String[] revisions = db.getRevisionNames(projectName);

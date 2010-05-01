@@ -63,9 +63,7 @@ public final class DeleteRevisionCommand extends DBCommand {
 	revision = args[0];
     }
 
-    /**
-       {@inheritDoc}
-    */
+    /** {@inheritDoc} */
     protected void run(final DB db) throws CommandException {
 	try {
 	    if (isAll) {

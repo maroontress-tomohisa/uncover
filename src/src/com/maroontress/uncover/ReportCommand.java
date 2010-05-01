@@ -79,9 +79,7 @@ public final class ReportCommand extends DBCommand {
 	return getBuild(db, projectName, rev, howToFix);
     }
 
-    /**
-       {@inheritDoc}
-    */
+    /** {@inheritDoc} */
     protected void run(final DB db) throws CommandException {
 	try {
 	    Build oldBuild = getBuild(db, projectName, oldRevision);

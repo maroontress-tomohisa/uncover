@@ -37,9 +37,7 @@ public final class DeleteProjectCommand extends DBCommand {
 	projectName = args[0];
     }
 
-    /**
-       {@inheritDoc}
-    */
+    /** {@inheritDoc} */
     protected void run(final DB db) throws CommandException {
 	try {
 	    db.deleteProject(projectName);

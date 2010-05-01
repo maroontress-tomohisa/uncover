@@ -33,9 +33,7 @@ public final class ListProjectsCommand extends DBCommand {
 	}
     }
 
-    /**
-       {@inheritDoc}
-    */
+    /** {@inheritDoc} */
     protected void run(final DB db) throws CommandException {
 	try {
 	    String[] projects = db.getProjectNames();

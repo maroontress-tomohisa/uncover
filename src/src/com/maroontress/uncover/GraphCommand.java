@@ -138,9 +138,7 @@ public final class GraphCommand extends DBCommand {
 	out.printf("}\n");
     }
 
-    /**
-       {@inheritDoc}
-    */
+    /** {@inheritDoc} */
     protected void run(final DB db) throws CommandException {
 	try {
             String howToFix = String.format(

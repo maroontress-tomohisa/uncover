@@ -42,26 +42,24 @@ public final class ConfigCommand extends Command {
 	    usage();
 	}
 
-	Set<String> set = new HashSet<String>();
-	set.add(Properties.KEY_DB_DEFAULT);
-	if (!set.contains(args[0])) {
-	    System.err.println("unknown key: " + args[0]);
-	    usage();
-	}
 	key = args[0];
 	value = args[1];
+
+	Set<String> set = new HashSet<String>();
+	set.add(Properties.KEY_DB_DEFAULT);
+	if (!set.contains(key)) {
+	    System.err.println("unknown key: " + key);
+	    usage();
+	}
+	if (value.length() > Preferences.MAX_VALUE_LENGTH) {
+	    System.err.println("too long value: " + value.length());
+	    usage();
+	}
     }
 
-    /**
-       {@inheritDoc}
-    */
+    /** {@inheritDoc} */
     public void run() {
 	Preferences prefs = Preferences.userNodeForPackage(Uncover.class);
-	try {
-	    prefs.put(key, value);
-	} catch (RuntimeException e) {
-	    System.err.printf("can't set preference: %s: %s%n", key, value);
-	    throw new ExitException(1);
-	}
+	prefs.put(key, value);
     }
 }

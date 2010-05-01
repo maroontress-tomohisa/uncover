@@ -36,9 +36,9 @@ public abstract class Toolkit {
     }
 
     /**
-      プログラムを終了します。
+       プログラムを終了します。
 
-      @param status 終了ステータスコード
+       @param status 終了ステータスコード
     */
     public abstract void exit(int status);
 

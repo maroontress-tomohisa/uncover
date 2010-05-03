@@ -131,7 +131,7 @@ public final class Uncover {
             }
             in.close();
         } catch (Exception e) {
-            e.printStackTrace();
+	    throw new RuntimeException("internal error.", e);
         }
         throw new ExitException(1);
     }

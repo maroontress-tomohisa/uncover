@@ -17,12 +17,6 @@ public final class Arc implements ArcSource {
     private boolean isFake;
 
     /**
-       デフォルトコンストラクタは使用できません。
-    */
-    private Arc() {
-    }
-
-    /**
        インスタンスを生成します。
 
        @param s アークソース

@@ -22,8 +22,11 @@ public abstract class RankMapFactory {
     */
     public final Map<Function, Integer> create(final Function[] array) {
         Map<Function, Integer> map = new HashMap<Function, Integer>();
-        int rank = 1;
         int n = array.length;
+	if (n == 0) {
+	    return map;
+	}
+        int rank = 1;
         int lastValue = getIntValue(array[0]);
 
         map.put(array[0], rank);

@@ -17,12 +17,6 @@ public final class Build implements BuildSource {
     private String platform;
 
     /**
-       デフォルトコンストラクタは使用できません。
-    */
-    private Build() {
-    }
-
-    /**
        インスタンスを生成します。
 
        @param s ビルドソース

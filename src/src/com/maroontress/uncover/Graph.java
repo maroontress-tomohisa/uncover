@@ -19,12 +19,6 @@ public final class Graph implements GraphSource {
     private Arc[] allArcs;
 
     /**
-       デフォルトコンストラクタは使用できません。
-    */
-    private Graph() {
-    }
-
-    /**
        インスタンスを生成します。
 
        @param s グラフソース

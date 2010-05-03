@@ -96,9 +96,9 @@ public abstract class Command {
 		       + "  %s%n",
 		       desc);
 	} catch (NoSuchFieldException e) {
-	    e.printStackTrace();
+	    throw new RuntimeException("internal error.", e);
 	} catch (IllegalAccessException e) {
-	    e.printStackTrace();
+	    throw new RuntimeException("internal error.", e);
 	}
     }
 

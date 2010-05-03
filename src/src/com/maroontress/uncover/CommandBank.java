@@ -31,9 +31,9 @@ public final class CommandBank {
 	    String name = (String) nameField.get(null);
 	    classMap.put(name, clazz);
 	} catch (IllegalAccessException e) {
-	    e.printStackTrace();
+	    throw new RuntimeException("internal error.", e);
 	} catch (NoSuchFieldException e) {
-	    e.printStackTrace();
+	    throw new RuntimeException("internal error.", e);
 	}
     }
 
@@ -61,13 +61,13 @@ public final class CommandBank {
 	    if (cause != null && cause instanceof RuntimeException) {
 		throw (RuntimeException) cause;
 	    }
-	    e.printStackTrace();
+	    throw new RuntimeException("internal error.", e);
 	} catch (IllegalAccessException e) {
-	    e.printStackTrace();
+	    throw new RuntimeException("internal error.", e);
 	} catch (NoSuchMethodException e) {
-	    e.printStackTrace();
+	    throw new RuntimeException("internal error.", e);
 	} catch (InstantiationException e) {
-	    e.printStackTrace();
+	    throw new RuntimeException("internal error.", e);
 	}
 	return command;
     }
@@ -97,9 +97,9 @@ public final class CommandBank {
 	    Field descField = clazz.getField("DESC");
 	    desc = (String) descField.get(null);
 	} catch (IllegalAccessException e) {
-	    e.printStackTrace();
+	    throw new RuntimeException("internal error.", e);
 	} catch (NoSuchFieldException e) {
-	    e.printStackTrace();
+	    throw new RuntimeException("internal error.", e);
 	}
 	return desc;
     }

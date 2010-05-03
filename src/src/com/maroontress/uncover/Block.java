@@ -20,12 +20,6 @@ public final class Block implements BlockSource {
     private int lineNumber;
 
     /**
-       デフォルトコンストラクタは使用できません。
-    */
-    private Block() {
-    }
-
-    /**
        インスタンスを生成します。
 
        @param s ブロックソース

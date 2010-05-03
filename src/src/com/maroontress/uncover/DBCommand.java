@@ -77,10 +77,9 @@ public abstract class DBCommand extends Command {
 	    runCommand(subname);
 	} catch (CommandException e) {
 	    if (e.getCause() == null) {
-		e.printStackTrace();
-	    } else {
-		handleException(e);
+		throw new RuntimeException("internal error.", e);
 	    }
+	    handleException(e);
 	    throw new ExitException(1);
 	}
     }

@@ -75,12 +75,6 @@ public final class Function implements FunctionSource {
     }
 
     /**
-       デフォルトコンストラクタは使用できません。
-    */
-    private Function() {
-    }
-
-    /**
        インスタンスを生成します。
 
        @param s 関数ソース

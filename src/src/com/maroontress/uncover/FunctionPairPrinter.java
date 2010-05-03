@@ -23,12 +23,6 @@ public abstract class FunctionPairPrinter {
     private String header;
 
     /**
-       デフォルトコンストラクタは使用できません。
-    */
-    private FunctionPairPrinter() {
-    }
-
-    /**
        インスタンスを生成します。
 
        @param pairList 関数ペアのリスト

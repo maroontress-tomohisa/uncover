@@ -1,0 +1,95 @@
+<?xml version="1.0"?>
+<project default="all" xmlns:cs="antlib:com.puppycrawl.tools.checkstyle">
+  <property name="prefix" location="/usr/local"/>
+  <property name="javadoc_linkurl" value="http://java.sun.com/javase/ja/6/docs/ja/api/"/>
+  <property name="javac_options" value="-encoding EUC-JP -Xlint:unchecked -Xlint:deprecation"/>
+  <property name="target.classes.dir" value="../src/classes"/>
+  <property name="target.src.dir" value="../src/src"/>
+  <property name="coverage.classes" value="**/*Test.java"/>
+
+  <taskdef classpath="cobertura.jar" resource="tasks.properties"/>
+
+  <target name="all" depends="coverage"/>
+
+  <target name="coverage" depends="test">
+    <cobertura-report srcdir="${target.src.dir}" destdir="html" encoding="EUC-JP"/>
+  </target>
+
+  <target name="test" depends="cobertura-instrument">
+    <junit fork="true" haltonfailure="true" haltonerror="true">
+      <classpath>
+        <pathelement path="${java.class.path}"/>
+        <pathelement location="instrumented-classes"/>
+        <pathelement location="${target.classes.dir}"/>
+        <pathelement location="classes"/>
+      </classpath>
+      <batchtest>
+        <fileset dir="src" includes="${coverage.classes}"/>
+        <formatter type="plain" usefile="false"/>
+      </batchtest>      
+    </junit>
+  </target>
+
+  <target name="fast-test" depends="compile">
+    <junit haltonfailure="true" haltonerror="true">
+      <classpath>
+        <pathelement path="${java.class.path}"/>
+        <pathelement location="${target.classes.dir}"/>
+        <pathelement location="classes"/>
+      </classpath>
+      <batchtest>
+        <fileset dir="src" includes="${coverage.classes}"/>
+        <formatter type="plain" usefile="false"/>
+      </batchtest>      
+    </junit>
+  </target>
+
+  <target name="cobertura-instrument" depends="compile">
+    <cobertura-instrument todir="instrumented-classes">
+      <fileset dir="${target.classes.dir}" includes="**/*.class"/>
+    </cobertura-instrument>
+  </target>
+
+  <target name="test-target">
+    <ant target="${target}" dir="../src"/>
+  </target>
+
+  <target name="compile-target">
+    <antcall target="test-target">
+      <param name="target" value="all"/>
+    </antcall>
+  </target>
+
+  <target name="destdir" depends="compile-target">
+    <mkdir dir="classes"/>
+  </target>
+
+  <target name="compile" depends="destdir">
+    <depend srcdir="src" destdir="classes" cache="depcache" closure="true"/>
+    <javac srcdir="src" destdir="classes" debug="true">
+      <compilerarg line="${javac_options}"/>
+      <classpath>
+        <pathelement location="${target.classes.dir}"/>
+      </classpath>
+    </javac>
+  </target>
+
+  <target name="clean">
+    <delete dir="html"/>
+    <delete file="cobertura.ser"/>
+    <delete dir="instrumented-classes"/>
+    <delete dir="classes"/>
+    <delete dir="depcache"/>
+  </target>
+
+  <target name="checkstyle">
+    <cs:checkstyle config="sun_checks.xml">
+      <fileset dir="src" includes="**/*.java"/>
+      <classpath>
+        <pathelement location="classes"/>
+        <pathelement location="${target.classes.dir}"/>
+      </classpath>
+      <formatter type="plain"/>
+    </cs:checkstyle>
+  </target>
+</project>

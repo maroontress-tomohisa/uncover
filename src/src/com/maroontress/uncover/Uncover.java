@@ -1,5 +1,6 @@
 package com.maroontress.uncover;
 
+import com.maroontress.cui.Option;
 import com.maroontress.cui.OptionListener;
 import com.maroontress.cui.Options;
 import com.maroontress.cui.OptionsParsingException;
@@ -13,7 +14,7 @@ import java.util.Arrays;
 */
 public final class Uncover {
     /** ヘルプメッセージのインデント幅です。 */
-    private static final int INDENT_WIDTH = 18;
+    private static final int INDENT_WIDTH = 22;
 
     /** コマンドラインで指定されたコマンドです。 */
     private Command command;
@@ -56,11 +57,11 @@ public final class Uncover {
 	    }
 	}, "Show version and exit.");
 
-	options.add("db", new OptionListener() {
+	options.add(new Option("db", 'd', new OptionListener() {
 	    public void run(final String name, final String arg) {
  		props.setDBFile(arg);
 	    }
-	}, "FILE", "Specify an SQLite database file.  Required.");
+	}, "FILE", "Specify an SQLite database file."));
 
 	String[] args = null;
 	try {

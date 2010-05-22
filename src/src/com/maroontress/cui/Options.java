@@ -2,8 +2,7 @@ package com.maroontress.cui;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
@@ -13,35 +12,26 @@ import java.util.TreeMap;
 */
 public final class Options {
     /** ヘルプメッセージのインデント幅の最小値です。 */
-    private static final int MIN_INDENT_WIDTH = 4;
-
-    /** 引数なしのオプションのセットです。 */
-    private Set<String> options;
-
-    /** 引数ありのオプションのセットです。 */
-    private Set<String> argOptions;
+    private static final int MIN_INDENT_WIDTH = 2;
 
     /**
-       コマンドラインオプションの名前と引数の値のマップです。引数なし
-       のオプションでは、引数の値はnullになります。
+       オプション名とオプションのマップです。オプションはすべてこのマッ
+       プに登録されます。
     */
-    private Map<String, String> valueMap;
+    private Map<String, Option> nameMap;
 
-    /** オプションに遭遇したときに呼び出すリスナのマップです。 */
-    private Map<String, OptionListener> listenerMap;
-
-    /** オプションのヘルプメッセージのマップです。 */
-    private Map<String, String> helpMap;
+    /**
+       オプションの短縮名とオプションのマップです。短縮名をもつオプショ
+       ンだけがこのマップに登録されます。
+    */
+    private Map<Character, Option> shortNameMap;
 
     /**
        コマンドラインオプションの定義を生成します。
     */
     public Options() {
-	options = new HashSet<String>();
-	argOptions = new HashSet<String>();
-	valueMap = new HashMap<String, String>();
-	listenerMap = new HashMap<String, OptionListener>();
-	helpMap = new TreeMap<String, String>();
+	nameMap = new TreeMap<String, Option>();
+	shortNameMap = new TreeMap<Character, Option>();
     }
 
     /**
@@ -51,8 +41,28 @@ public final class Options {
 
        @return ヘルプメッセージのマップ
     */
-    public Map<String, String> getHelpMap() {
-	return helpMap;
+    @Deprecated public Map<String, String> getHelpMap() {
+	Map<String, String> map = new TreeMap<String, String>();
+	Collection<Option> allOptions = nameMap.values();
+	for (Option o : allOptions) {
+	    map.put(o.getHelpName(), o.getHelpDesc());
+	}
+	return map;
+    }
+
+    /**
+       オプションを追加します。
+
+       @param option オプション
+    */
+    public void add(final Option option) {
+	String name = option.getName();
+	nameMap.put(name, option);
+
+	Character shortName = option.getShortName();
+	if (shortName != null) {
+	    shortNameMap.put(shortName, option);
+	}
     }
 
     /**
@@ -62,11 +72,9 @@ public final class Options {
        @param listener オプションリスナ
        @param help ヘルプメッセージ
     */
-    public void add(final String name,
-		    final OptionListener listener,
+    public void add(final String name, final OptionListener listener,
 		    final String help) {
-	listenerMap.put(name, listener);
-	add(name, help);
+	add(new Option(name, null, listener, null, help));
     }
 
     /**
@@ -75,10 +83,8 @@ public final class Options {
        @param name オプション名
        @param help ヘルプメッセージ
     */
-    public void add(final String name,
-		    final String help) {
-	options.add(name);
-	helpMap.put(name, help);
+    public void add(final String name, final String help) {
+	add(new Option(name, null, null, null, help));
     }
 
     /**
@@ -89,12 +95,9 @@ public final class Options {
        @param argName 引数の名前
        @param help ヘルプメッセージ
     */
-    public void add(final String name,
-		    final OptionListener listener,
-		    final String argName,
-		    final String help) {
-	listenerMap.put(name, listener);
-	add(name, argName, help);
+    public void add(final String name, final OptionListener listener,
+		    final String argName, final String help) {
+	add(new Option(name, null, listener, argName, help));
     }
 
     /**
@@ -104,25 +107,13 @@ public final class Options {
        @param argName 引数の名前
        @param help ヘルプメッセージ
     */
-    public void add(final String name,
-		    final String argName,
+    public void add(final String name, final String argName,
 		    final String help) {
-	argOptions.add(name);
-	helpMap.put(name + "=" + argName, help);
+	add(new Option(name, null, null, argName, help));
     }
 
     /**
-       文字列がオプションかどうかを取得します。
-
-       @param s 文字列
-       @return sがオプションの場合はtrue
-    */
-    private boolean isOption(final String s) {
-	return s.startsWith("--");
-    }
-
-    /**
-       オプションをパースします。
+       ロング形式オプションをパースします。
 
        @param s オプション
        @throws OptionsParsingException オプションのパースに失敗したと
@@ -131,32 +122,84 @@ public final class Options {
     private void parseOption(final String s) throws OptionsParsingException {
 	String argName;
 	String argValue;
-	Set<String> set;
+	boolean hasArg;
 	int n = s.indexOf('=');
 	if (n < 0) {
 	    argName = s.substring(2);
 	    argValue = null;
-	    set = options;
+	    hasArg = false;
 	} else {
 	    argName = s.substring(2, n);
 	    argValue = s.substring(n + 1);
-	    set = argOptions;
+	    hasArg = true;
 	}
-	if (!set.contains(argName)) {
+	Option opt = nameMap.get(argName);
+	if (opt == null || opt.hasArgument() != hasArg) {
 	    throw new OptionsParsingException("invalid option: " + s);
 	}
-	OptionListener listener = listenerMap.get(argName);
-	if (listener != null) {
-	    listener.run(argName, argValue);
+	opt.setValue(argValue);
+    }
+
+    /**
+       短縮名のオプションをパースします。
+
+       @param c オプション名
+       @param av オプションの配列
+       @param offset オプションのインデックス
+       @return オプションとして消費した配列の要素数
+       @throws OptionsParsingException オプションのパースに失敗したと
+       きにスローします。
+    */
+    private int parseShortOption(final char c, final String[] av,
+				 final int offset)
+	throws OptionsParsingException {
+	String s = av[offset];
+	Option opt = shortNameMap.get(c);
+	if (opt == null) {
+	    throw new OptionsParsingException("invalid option: " + s);
 	}
-	valueMap.put(argName, argValue);
+	if (!opt.hasArgument()) {
+	    opt.setValue(null);
+	    return 1;
+	}
+	int k = offset + 1;
+	if (k >= av.length) {
+	    throw new OptionsParsingException("argument not found: " + s);
+	}
+	opt.setValue(av[k]);
+	return 2;
+    }
+
+    /**
+       オプションをパースします。
+
+       @param av オプションの配列
+       @param offset オプションのインデックス
+       @return オプションとして消費した配列の要素数、非オプションでは0
+       @throws OptionsParsingException オプションのパースに失敗したと
+       きにスローします。
+    */
+    private int parseOption(final String[] av,
+			    final int offset) throws OptionsParsingException {
+	String s = av[offset];
+	if (s.startsWith("--")) {
+	    parseOption(s);
+	    return 1;
+	}
+	if (!s.startsWith("-")) {
+	    return 0;
+	}
+	if (s.length() != 2) {
+	    throw new OptionsParsingException("invalid option: " + s);
+	}
+	return parseShortOption(s.charAt(1), av, offset);
     }
 
     /**
        コマンドラインの引数をパースします。
 
-       --で始まる引数をオプションとして解釈します。それ以外の引数が出
-       現した段階でパースを終了します。
+       -または--で始まる引数をオプションとして解釈します。それ以外の引
+       数が出現した段階でパースを終了します。
 
        @param av コマンドラインの引数の配列
        @return コマンドラインの引数のうち、最初に出現した非オプション
@@ -165,11 +208,11 @@ public final class Options {
     */
     public String[] parseFore(final String[] av)
 	throws OptionsParsingException {
-	String s;
 	int k;
+	int d;
 
-	for (k = 0; k < av.length && isOption(s = av[k]); ++k) {
-	    parseOption(s);
+	for (k = 0; k < av.length && (d = parseOption(av, k)) > 0; k += d) {
+	    continue;
 	}
 	return Arrays.copyOfRange(av, k, av.length);
     }
@@ -177,8 +220,8 @@ public final class Options {
     /**
        コマンドラインの引数をパースします。
 
-       --で始まる引数をオプションとして解釈します。それ以外の引数はオ
-       プションとして解釈せず、スキップします。
+       -または--で始まる引数をオプションとして解釈します。それ以外の引
+       数はオプションとして解釈せず、スキップします。
 
        @param av コマンドラインの引数の配列
        @return オプションではない引数の配列
@@ -186,15 +229,30 @@ public final class Options {
     */
     public String[] parse(final String[] av) throws OptionsParsingException {
 	ArrayList<String> args = new ArrayList<String>();
+	int k;
+	int d;
 
-	for (String s : av) {
-	    if (!isOption(s)) {
-		args.add(s);
-		continue;
+	for (k = 0; k < av.length && (d = parseOption(av, k)) >= 0; k += d) {
+	    if (d == 0) {
+		args.add(av[k]);
+		++d;
 	    }
-	    parseOption(s);
 	}
 	return args.toArray(new String[args.size()]);
+    }
+
+    /**
+       指定した名前のオプションを取得します。
+
+       @param name オプション名
+       @return オプション
+    */
+    private Option getOption(final String name) {
+	Option option = nameMap.get(name);
+	if (option == null) {
+	    throw new IllegalArgumentException("not found: " + name);
+	}
+	return option;
     }
 
     /**
@@ -208,7 +266,7 @@ public final class Options {
        @return オプションの値、またはnull
     */
     public String getValue(final String name) {
-	return valueMap.get(name);
+	return getOption(name).getValue();
     }
 
     /**
@@ -219,7 +277,7 @@ public final class Options {
        @return オプションが指定されていればtrue、そうでなければfalse
     */
     public boolean specified(final String name) {
-	return valueMap.containsKey(name);
+	return getOption(name).isSpecified();
     }
 
     /**
@@ -230,17 +288,21 @@ public final class Options {
     */
     public String getHelpMessage(final int indentWidth) {
 	int width = Math.max(MIN_INDENT_WIDTH, indentWidth);
-	String helpIndent = "\n";
+	StringBuilder b = new StringBuilder("\n");
 	for (int k = 0; k < width; ++k) {
-	    helpIndent += " ";
+	    b.append(" ");
 	}
-	Set<Map.Entry<String, String>> set = helpMap.entrySet();
-	String format = "--%-" + (width - MIN_INDENT_WIDTH) + "s  %s\n";
-	String m = "";
-	for (Map.Entry<String, String> e : set) {
-	    String desc = e.getValue().replace("\n", helpIndent);
-	    m += String.format(format, e.getKey(), desc);
+	String helpIndent = b.toString();
+	String format = "%-" + (width - MIN_INDENT_WIDTH) + "s  %s\n";
+	b = new StringBuilder();
+
+	Set<String> nameSet = nameMap.keySet();
+	for (String name : nameSet) {
+	    Option opt = nameMap.get(name);
+	    String key = opt.getHelpName();
+	    String desc = opt.getHelpDesc().replace("\n", helpIndent);
+	    b.append(String.format(format, key, desc));
 	}
-	return m;
+	return b.toString();
     }
 }

@@ -1,7 +1,5 @@
 package com.maroontress.uncover;
 
-import java.util.HashSet;
-import java.util.Set;
 import java.util.prefs.Preferences;
 
 /**
@@ -45,9 +43,7 @@ public final class ConfigCommand extends Command {
 	key = args[0];
 	value = args[1];
 
-	Set<String> set = new HashSet<String>();
-	set.add(Properties.KEY_DB_DEFAULT);
-	if (!set.contains(key)) {
+	if (!ConfigKey.keySet().contains(key)) {
 	    System.err.println("unknown key: " + key);
 	    usage();
 	}

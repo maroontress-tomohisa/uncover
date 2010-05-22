@@ -6,9 +6,6 @@ import java.util.prefs.Preferences;
    プロパティです。
 */
 public final class Properties {
-    /** デフォルトのデータベースファイルのキーです。 */
-    public static final String KEY_DB_DEFAULT = "db.default";
-
     /** データベースファイルのパスです。 */
     private String dbFile;
 
@@ -17,7 +14,7 @@ public final class Properties {
     */
     public Properties() {
 	Preferences prefs = Preferences.userNodeForPackage(Uncover.class);
-	dbFile = prefs.get(KEY_DB_DEFAULT, null);
+	dbFile = prefs.get(ConfigKey.DB_DEFAULT, null);
     }
 
     /**

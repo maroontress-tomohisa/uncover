@@ -20,4 +20,14 @@ public class OptionsParsingException extends Exception {
     public OptionsParsingException(final String m) {
 	super(m);
     }
+
+    /**
+       コマンドラインオプションのパースに関する例外を生成します。
+
+       @param m メッセージ
+       @param t 原因
+    */
+    public OptionsParsingException(final String m, final Throwable t) {
+        super(m, t);
+    }
 }

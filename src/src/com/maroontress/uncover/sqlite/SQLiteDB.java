@@ -136,6 +136,28 @@ public final class SQLiteDB implements DB {
 	}
     }
 
+    /** {@inheritDoc} */
+    public void newProject(final String projectName) throws DBException {
+	verifyIntegrity();
+	try {
+	    ProjectDeal projectDeal = new ProjectDeal(con);
+	    long projectID = projectDeal.queryID(projectName);
+	    if (projectID != -1) {
+		throw new DBException("already exists: " + projectName);
+	    }
+	    Adder<ProjectRow> adder = new QuerierFactory<ProjectRow>(
+		con, Table.PROJECT, ProjectRow.class).createAdder();
+	    adder.setRow(new ProjectRow());
+	    adder.getRow().set(projectName);
+	    adder.execute();
+	    con.commit();
+	} catch (SQLException e) {
+	    rollback();
+	    throw new DBException("failed to create a new project: "
+				  + e.getMessage(), e);
+	}
+    }
+
     /**
        プロジェクトの配列を取得します。
 

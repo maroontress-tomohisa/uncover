@@ -101,6 +101,15 @@ public interface DB {
     void deleteBuild(String projectName, String id) throws DBException;
 
     /**
+       空のプロジェクトを生成します。
+
+       @param projectName プロジェクト名
+       @throws DBException データベース操作に関するエラーが発生したと
+       きにスローします。
+    */
+    void newProject(String projectName) throws DBException;
+
+    /**
        プロジェクトを削除します。
 
        @param projectName プロジェクト名

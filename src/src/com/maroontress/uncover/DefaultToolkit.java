@@ -1,7 +1,9 @@
 package com.maroontress.uncover;
 
 import com.maroontress.uncover.coverture.CovertureParser;
+import com.maroontress.uncover.gcov.GcovNoteParser;
 import com.maroontress.uncover.sqlite.SQLiteDB;
+import java.util.List;
 
 /**
    デフォルトのツールキットです。
@@ -16,6 +18,12 @@ public final class DefaultToolkit extends Toolkit {
     /** {@inheritDoc} */
     public void exit(final int status) {
 	System.exit(status);
+    }
+
+    /** {@inheritDoc} */
+    public Parser createNoteParser(final List<String> fileList)
+	throws ParsingException {
+	return new GcovNoteParser(fileList);
     }
 
     /** {@inheritDoc} */

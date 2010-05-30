@@ -1,5 +1,7 @@
 package com.maroontress.uncover;
 
+import java.util.List;
+
 /**
    ツールキットです。
 */
@@ -41,6 +43,17 @@ public abstract class Toolkit {
        @param status 終了ステータスコード
     */
     public abstract void exit(int status);
+
+    /**
+       関数グラフのイテレータファクトリを生成します。
+
+       @param fileList 入力となるファイルのリスト
+       @return 関数グラフのイテレータファクトリ
+       @throws ParsingException ファイルのパースでエラーが発生したとき
+       にスローします。
+    */
+    public abstract Parser createNoteParser(final List<String> fileList)
+	throws ParsingException;
 
     /**
        関数グラフのイテレータファクトリを生成します。

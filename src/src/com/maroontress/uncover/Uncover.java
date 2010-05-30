@@ -46,6 +46,7 @@ public final class Uncover {
 	bank.addCommandClass(ConfigCommand.class);
 	bank.addCommandClass(ShowConfigCommand.class);
 	bank.addCommandClass(NewProjectCommand.class);
+	bank.addCommandClass(CommitNoteCommand.class);
 
 	options.add("help", new OptionListener() {
 	    public void run(final String name, final String arg) {

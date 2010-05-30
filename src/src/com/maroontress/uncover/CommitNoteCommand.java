@@ -2,20 +2,27 @@ package com.maroontress.uncover;
 
 import com.maroontress.cui.OptionListener;
 import com.maroontress.cui.Options;
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 /**
-   commitコマンドです。
+   commit-noteコマンドです。
 */
-public final class CommitCommand extends DBCommand {
+public final class CommitNoteCommand extends DBCommand {
     /** コマンド名です。 */
-    public static final String NAME = "commit";
+    public static final String NAME = "commit-note";
 
     /** コマンドの引数の説明です。 */
-    public static final String ARGS = "FILE";
+    public static final String ARGS = "[FILE...]";
 
     /** コマンドの説明です。 */
-    public static final String DESC = "Commit FILE to the database.";
+    public static final String DESC = "Commit gcno files to the database.";
 
     /** プロジェクト名です。 */
     private String projectName;
@@ -29,16 +36,19 @@ public final class CommitCommand extends DBCommand {
     /** プラットフォームです。 */
     private String platform;
 
-    /** Covertureが出力したファイルのパスです。 */
-    private String xmlFile;
+    /** コマンドラインで指定されたgcnoファイルのパスの配列です。 */
+    private String[] files;
+
+    /** gcnoファイルのリストファイルのパスです。 */
+    private String inputFile;
 
     /**
-       commitコマンドのインスタンスを生成します。
+       commit-noteコマンドのインスタンスを生成します。
 
        @param props プロパティ
        @param av コマンドの引数の配列
     */
-    public CommitCommand(final Properties props, final String[] av) {
+    public CommitNoteCommand(final Properties props, final String[] av) {
 	super(props);
 
 	Options opt = getOptions();
@@ -67,15 +77,14 @@ public final class CommitCommand extends DBCommand {
 	    }
 	}, "ARG", "Specify a platform.");
 
-	String[] args = parseArguments(av);
-	if (args.length < 1) {
-	    System.err.println("FILE must be specified.");
-	    usage();
-	}
-	if (args.length > 1) {
-	    System.err.println("too many arguments: " + args[1]);
-	    usage();
-	}
+	opt.add("input-file", new OptionListener() {
+	    public void run(final String name, final String arg) {
+		inputFile = arg;
+	    }
+	}, "FILE", "Read the list of files from FILE:\n"
+		+ "FILE can be - for standard input.");
+
+	files = parseArguments(av);
 	if (projectName == null || projectName.isEmpty()) {
 	    System.err.println("--project=ARG must be specified.");
 	    usage();
@@ -104,13 +113,61 @@ public final class CommitCommand extends DBCommand {
 				     System.getProperty("os.arch"),
 				     System.getProperty("os.version"));
 	}
-	xmlFile = args[0];
+	if (files.length == 0 && inputFile == null) {
+	    System.err.println("no gcno file specified.");
+	    usage();
+	}
+    }
+
+    /**
+       入力ファイルのパスリストを生成します。
+
+       @throws CommandException コマンドの実行に関するエラーが発生した
+       ときにスローします。
+       @return 入力ファイルのパスリスト
+    */
+    private List<String> createFileList() throws CommandException {
+	List<String> fileList = new ArrayList<String>();
+	for (String file : files) {
+	    fileList.add(file);
+	}
+	if (inputFile == null) {
+	    return fileList;
+	}
+	InputStreamReader in;
+        try {
+            if (inputFile.equals("-")) {
+                in = new InputStreamReader(System.in);
+            } else {
+                in = new FileReader(inputFile);
+            }
+        } catch (FileNotFoundException e) {
+	    throw new CommandException("not found: " + inputFile, e);
+	}
+	try {
+            BufferedReader rd = new BufferedReader(in);
+            String file;
+            while ((file = rd.readLine()) != null) {
+		fileList.add(file);
+            }
+	} catch (IOException e) {
+	    throw new CommandException("failed to read: " + inputFile, e);
+        } finally {
+	    try {
+		in.close();
+	    } catch (IOException e) {
+		throw new RuntimeException("internal error.", e);
+	    }
+	}
+	return fileList;
     }
 
     /** {@inheritDoc} */
     protected void run(final DB db) throws CommandException {
 	try {
-	    final Parser parser = Toolkit.getInstance().createParser(xmlFile);
+	    List<String> fileList = createFileList();
+	    final Parser parser
+		= Toolkit.getInstance().createNoteParser(fileList);
 	    db.commit(new CommitSource() {
 		public String getProjectName() {
 		    return projectName;
@@ -129,7 +186,7 @@ public final class CommitCommand extends DBCommand {
 		}
 	    });
 	} catch (ParsingException e) {
-	    throw new CommandException("can't import: " + xmlFile, e);
+	    throw new CommandException("failed to parse.", e);
 	} catch (DBException e) {
 	    throw new CommandException("failed to commit.", e);
 	}

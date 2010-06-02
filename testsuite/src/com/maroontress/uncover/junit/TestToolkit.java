@@ -15,9 +15,14 @@ import com.maroontress.uncover.GraphSource;
 import com.maroontress.uncover.Parser;
 import com.maroontress.uncover.ParsingException;
 import com.maroontress.uncover.Toolkit;
+import java.util.List;
 
 public class TestToolkit extends Toolkit {
     public void exit(final int exitStatus) {
+    }
+    public Parser createNoteParser(final List<String> fileList)
+	throws ParsingException {
+	return null;
     }
     public Parser createParser(final String file) throws ParsingException {
 	return new TestParser(file);

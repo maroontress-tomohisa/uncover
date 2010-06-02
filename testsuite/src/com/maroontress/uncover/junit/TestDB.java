@@ -38,6 +38,8 @@ public class TestDB implements DB {
     public void deleteBuilds(final String projectName,
                              final String revision) throws DBException {
     }
+    public void newProject(final String projectName) throws DBException {
+    }
     public void deleteProject(final String projectName) throws DBException {
     }
     public Graph getGraph(final String projectName, final String id,

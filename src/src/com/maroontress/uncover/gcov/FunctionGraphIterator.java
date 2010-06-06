@@ -69,7 +69,7 @@ public final class FunctionGraphIterator implements Iterator<FunctionGraph> {
 		    e.printStackTrace();
 		}
 	    } while (note == null);
-	    queue.addAll(note.getNoteItems());
+	    queue.addAll(note.getFunctionGraphCollection());
 	}
 	return true;
     }

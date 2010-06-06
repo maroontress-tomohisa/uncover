@@ -1,11 +1,11 @@
 package com.maroontress.uncover.gcov;
 
-import com.maroontress.coverture.CorruptedFileException;
-import com.maroontress.coverture.Origin;
-import com.maroontress.coverture.gcda.DataRecord;
-import com.maroontress.coverture.gcda.FunctionDataRecord;
-import com.maroontress.coverture.gcno.FunctionGraphRecord;
-import com.maroontress.coverture.gcno.NoteRecord;
+import com.maroontress.gcovparser.CorruptedFileException;
+import com.maroontress.gcovparser.Origin;
+import com.maroontress.gcovparser.gcda.DataRecord;
+import com.maroontress.gcovparser.gcda.FunctionDataRecord;
+import com.maroontress.gcovparser.gcno.FunctionGraphRecord;
+import com.maroontress.gcovparser.gcno.NoteRecord;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;

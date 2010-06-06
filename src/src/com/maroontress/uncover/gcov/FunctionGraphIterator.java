@@ -26,12 +26,12 @@ public final class FunctionGraphIterator implements Iterator<FunctionGraph> {
     /**
        関数を生成するための関数ソースです。
     */
-    private GcovFunctionSource functionSource;
+    private NoteItemFunctionSource functionSource;
 
     /**
        グラフを生成するためのグラフソースです。
     */
-    private GcovGraphSource graphSource;
+    private NoteItemGraphSource graphSource;
 
     /**
        ひとつのファイルに含まれる関数グラフを保持するキューです。
@@ -47,8 +47,8 @@ public final class FunctionGraphIterator implements Iterator<FunctionGraph> {
 	this.files = files;
 	offset = 0;
 	toolkit = Toolkit.getInstance();
-	functionSource = new GcovFunctionSource();
-	graphSource = new GcovGraphSource();
+	functionSource = new NoteItemFunctionSource();
+	graphSource = new NoteItemGraphSource();
 	queue = new ArrayDeque<NoteItem>();
     }
 

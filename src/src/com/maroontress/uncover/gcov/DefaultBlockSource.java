@@ -36,17 +36,19 @@ public final class DefaultBlockSource implements BlockSource {
 	lineNumber = 0;
 
 	LineEntry[] lines = block.getLines();
-	if (lines == null || lines.length == 0) {
+	if (lines == null) {
 	    return;
 	}
-	LineEntry e = lines[0];
-	String fileName = e.getFileName();
-	int[] num = e.getLines();
-	if (num.length == 0) {
+	for (LineEntry e : lines) {
+	    String fileName = e.getFileName();
+	    int[] nums = e.getLines();
+	    if (nums.length == 0) {
+		continue;
+	    }
+	    sourceFile = fileName;
+	    lineNumber = nums[0];
 	    return;
 	}
-	sourceFile = fileName;
-	lineNumber = num[0];
     }
 
     /** {@inheritDoc} */

@@ -15,8 +15,8 @@ import java.util.ArrayList;
    @param <T> ブロックの具象クラス
    @param <U> アークの具象クラス
 */
-public abstract class AbstractFunctionGraph<T extends AbstractBlock,
-					    U extends AbstractArc> {
+public abstract class AbstractFunctionGraph<T extends AbstractBlock<T, U>,
+					    U extends AbstractArc<T, U>> {
 
     /** 識別子です。 */
     private int id;
@@ -221,6 +221,8 @@ public abstract class AbstractFunctionGraph<T extends AbstractBlock,
 	    T start = blocks.get(startIndex);
 	    T end = blocks.get(endIndex);
 	    U arc = createArc(start, end, flags);
+	    start.addOutArc(arc);
+	    end.addInArc(arc);
 	    if (!arc.isOnTree()) {
 		/*
 		  スパニングツリーではないアーク。gcdaファイルにはこの

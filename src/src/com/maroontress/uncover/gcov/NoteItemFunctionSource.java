@@ -1,6 +1,6 @@
 package com.maroontress.uncover.gcov;
 
-import com.maroontress.gcovparser.AbstractArc;
+import com.maroontress.gcovparser.DefaultArc;
 import com.maroontress.gcovparser.DefaultBlock;
 import com.maroontress.uncover.FunctionSource;
 import java.util.ArrayList;
@@ -37,8 +37,8 @@ public final class NoteItemFunctionSource implements FunctionSource {
         executedArcs = 0;
         Iterable<DefaultBlock> blocks = item.getBlocks();
 	for (DefaultBlock block : blocks) {
-	    ArrayList<? extends AbstractArc> arcList = block.getOutArcs();
- 	    for (AbstractArc arc : arcList) {
+	    ArrayList<DefaultArc> arcList = block.getOutArcs();
+ 	    for (DefaultArc arc : arcList) {
 		if (arc.isFake()) {
 		    continue;
 		}

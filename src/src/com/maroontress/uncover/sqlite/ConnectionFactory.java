@@ -1,6 +1,7 @@
 package com.maroontress.uncover.sqlite;
 
 import com.maroontress.uncover.DBException;
+import com.maroontress.uncover.ConfigKey;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -10,23 +11,25 @@ import java.net.URLClassLoader;
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.prefs.Preferences;
 
 /**
+   JDBCのコネクションを生成するファクトリです。
 */
 public final class ConnectionFactory {
-    /** */
-    private static final String EXT_DIRS = "com.maroontress.uncover.ext.dirs";
-
-    /** */
+    /** クラスパスのプロパティのキーです。 */
     private static final String CLASS_PATH = "java.class.path";
 
-    /** */
+    /**
+       JDBCドライバをロードするクラスを格納するJARファイルのファイル名
+       です。
+    */
     private static final String JDBC_SKIRT_JAR = "jdbcskirt.jar";
 
-    /** */
+    /** JDBCドライバをロードするクラスのクラス名です。 */
     private static final String SKIRT = "com.maroontress.jdbcskirt.Skirt";
 
-    /** */
+    /** ドライバローダークラスのメソッド名です。 */
     private static final String GET_CONNECTION = "getConnection";
 
     /**
@@ -57,7 +60,8 @@ public final class ConnectionFactory {
 	final String className, final String jdbcURL) throws DBException {
 	List<File> list = new ArrayList<File>();
 
-	String extDirs = getProperty(EXT_DIRS);
+	Preferences prefs = Preferences.userNodeForPackage(ConfigKey.class);
+	String extDirs = prefs.get(ConfigKey.EXT_DIRS, null);
 	if (extDirs != null) {
 	    String[] dirs = extDirs.split(File.pathSeparator);
 	    for (String d : dirs) {

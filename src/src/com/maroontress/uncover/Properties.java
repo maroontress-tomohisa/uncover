@@ -13,7 +13,7 @@ public final class Properties {
        デフォルトのプロパティを生成します。
     */
     public Properties() {
-	Preferences prefs = Preferences.userNodeForPackage(Uncover.class);
+	Preferences prefs = Preferences.userNodeForPackage(ConfigKey.class);
 	dbFile = prefs.get(ConfigKey.DB_DEFAULT, null);
     }
 

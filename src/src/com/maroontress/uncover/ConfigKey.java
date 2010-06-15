@@ -11,6 +11,9 @@ public final class ConfigKey {
     /** デフォルトのデータベースファイルのキーです。 */
     public static final String DB_DEFAULT = "db.default";
 
+    /** JDBCドライバのあるディレクトリのパスです。 */
+    public static final String EXT_DIRS = "ext.dirs";
+
     /** コンストラクタは使用できません。 */
     private ConfigKey() {
     }

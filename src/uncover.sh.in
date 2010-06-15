@@ -1,9 +1,6 @@
 #!/bin/sh
 
 o="-Xmx256m"
-if [ "${UNCOVER_EXT_DIRS}" != "" ] ; then
-    o="$o -Dcom.maroontress.uncover.ext.dirs=${UNCOVER_EXT_DIRS}"
-fi
 if [ "${UNCOVER_JVM_OPTIONS}" != "" ] ; then
     o="$o ${UNCOVER_JVM_OPTIONS}"
 fi

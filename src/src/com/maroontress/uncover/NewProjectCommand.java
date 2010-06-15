@@ -26,6 +26,10 @@ public final class NewProjectCommand extends DBCommand {
 	super(props);
 
 	String[] args = parseArguments(av);
+	if (args.length < 1) {
+	    System.err.println("too few arguments.");
+	    usage();
+	}
 	if (args.length > 1) {
 	    System.err.println("too many arguments: " + args[1]);
 	    usage();

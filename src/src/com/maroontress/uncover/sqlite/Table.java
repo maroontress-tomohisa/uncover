@@ -13,6 +13,9 @@ public final class Table {
     /** プロジェクトのテーブル名です。 */
     public static final String PROJECT = PREFIX + "project";
 
+    /** gcnoファイルのパスのテーブル名です。 */
+    public static final String GCNO_FILE = PREFIX + "gcnoFile";
+
     /** ビルドのテーブル名です。 */
     public static final String BUILD = PREFIX + "build";
 

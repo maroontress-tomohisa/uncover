@@ -44,7 +44,11 @@ public final class InitDeal {
 	s.executeUpdate("CREATE TABLE " + Table.PROJECT + " ("
 			+ "id INTEGER PRIMARY KEY, "
 			+ getTableDefinition(ProjectRow.class)
-			+ ")");
+			+ ", UNIQUE(name))");
+	s.executeUpdate("CREATE TABLE " + Table.GCNO_FILE + " ("
+			+ "id INTEGER PRIMARY KEY, "
+			+ getTableDefinition(GcnoFileRow.class)
+			+ ", UNIQUE (gcnoFile))");
 	s.executeUpdate("CREATE TABLE " + Table.BUILD + " ("
 			+ "id INTEGER PRIMARY KEY, "
 			+ getTableDefinition(BuildRow.class)
@@ -52,12 +56,11 @@ public final class InitDeal {
 	s.executeUpdate("CREATE TABLE " + Table.FUNCTION + " ("
 			+ "id INTEGER PRIMARY KEY, "
 			+ getTableDefinition(FunctionRow.class)
-			+ ", UNIQUE (name, gcnoFile, projectID)"
-			+ ")");
+			+ ", UNIQUE (name, gcnoFileID, projectID))");
 	s.executeUpdate("CREATE TABLE " + Table.GRAPH + " ("
 			+ "id INTEGER PRIMARY KEY, "
 			+ getTableDefinition(GraphRow.class)
-			+ ")");
+			+ ", UNIQUE(functionID, buildID))");
 	s.executeUpdate("CREATE TABLE " + Table.GRAPH_SUMMARY + " ("
 			+ getTableDefinition(GraphSummaryRow.class)
 			+ ")");

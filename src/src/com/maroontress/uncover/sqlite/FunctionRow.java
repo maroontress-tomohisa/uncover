@@ -7,8 +7,8 @@ public final class FunctionRow extends Row {
     /** 関数名です。 */
     private String name;
 
-    /** gcnoファイルのファイル名です。 */
-    private String gcnoFile;
+    /** gcnoファイルのIDです。 */
+    private long gcnoFileID;
 
     /** プロジェクトIDです。 */
     private long projectID;
@@ -23,13 +23,13 @@ public final class FunctionRow extends Row {
        フィールドに値を設定します。
 
        @param name 関数名
-       @param gcnoFile gcnoファイルのファイル名
+       @param gcnoFileID gcnoファイルのID
        @param projectID プロジェクトID
     */
-    public void set(final String name, final String gcnoFile,
+    public void set(final String name, final long gcnoFileID,
 		    final long projectID) {
 	this.name = name;
-	this.gcnoFile = gcnoFile;
+	this.gcnoFileID = gcnoFileID;
 	this.projectID = projectID;
     }
 }

@@ -34,21 +34,21 @@ public final class FunctionResolver {
     }
 
     /**
-       関数名、gcnoファイル名、プロジェクトIDを指定して、関数IDを取得
+       関数名、gcnoファイルID、プロジェクトIDを指定して、関数IDを取得
        します。
 
        マッチする関数IDが存在しない場合は-1を返します。
 
        @param functionName 関数名
-       @param gcnoFile gcnoファイル名
+       @param gcnoFileID gcnoファイルID
        @param projectID プロジェクトID
        @return 関数ID、または-1
        @throws SQLException クエリにエラーが発生したときにスローします。
     */
     public long getFunctionID(final String functionName,
-			      final String gcnoFile,
+			      final long gcnoFileID,
 			      final long projectID) throws SQLException {
-	fetcher.getRow().set(functionName, gcnoFile, projectID);
+	fetcher.getRow().set(functionName, gcnoFileID, projectID);
 	ResultSet rs = fetcher.executeQuery();
 
 	long functionID = -1;
@@ -58,8 +58,8 @@ public final class FunctionResolver {
 	}
 	if (k > 1) {
 	    String s = String.format(
-		"projectID: %s; function %s (%s) found more than one.",
-		projectID, functionName, gcnoFile);
+		"function %s (gcnoFile=%d; project=%d) found more than one.",
+		functionName, gcnoFileID, projectID);
 	    throw new TableInconsistencyException(s);
 	}
 	return functionID;

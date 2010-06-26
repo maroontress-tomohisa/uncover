@@ -8,6 +8,8 @@ import com.maroontress.uncover.FunctionGraph;
 import com.maroontress.uncover.Graph;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Map;
+import java.util.WeakHashMap;
 
 /**
    コミットの処理を扱います。
@@ -15,6 +17,9 @@ import java.sql.SQLException;
 public final class CommitDeal {
     /** データベースとの接続です。 */
     private Connection con;
+
+    /** gcnoファイルのパスとIDのマップです。 */
+    private Map<String, Long> gcnoFileMap;
 
     /** コミット情報です。 */
     private CommitSource source;
@@ -24,6 +29,12 @@ public final class CommitDeal {
 
     /** 関数テーブルに行を追加するインスタンスです。 */
     private Adder<FunctionRow> functionRowAdder;
+
+    /** gcnoファイルIDを取得するインスタンスです。 */
+    private GcnoFileResolver gcnoFileResolver;
+
+    /** gcnoファイルテーブルに行を追加するインスタンスです。 */
+    private Adder<GcnoFileRow> gcnoFileRowAdder;
 
     /** グラフテーブルに行を追加するインスタンスです。 */
     private Adder<GraphRow> graphRowAdder;
@@ -49,10 +60,17 @@ public final class CommitDeal {
 	this.con = con;
 	this.source = source;
 
+	gcnoFileMap = new WeakHashMap<String, Long>();
+
 	functionResolver = new FunctionResolver(con);
 	functionRowAdder = new QuerierFactory<FunctionRow>(
 	    con, Table.FUNCTION, FunctionRow.class).createAdder();
 	functionRowAdder.setRow(functionResolver.getFunctionRow());
+
+	gcnoFileResolver = new GcnoFileResolver(con);
+	gcnoFileRowAdder = new QuerierFactory<GcnoFileRow>(
+	    con, Table.GCNO_FILE, GcnoFileRow.class).createAdder();
+	gcnoFileRowAdder.setRow(gcnoFileResolver.getGcnoFileRow());
 
 	graphRowAdder = new QuerierFactory<GraphRow>(
 	    con, Table.GRAPH, GraphRow.class).createAdder();
@@ -100,6 +118,30 @@ public final class CommitDeal {
     }
 
     /**
+       関数のgcnoファイルIDを取得します。
+
+       @param function 関数
+       @return gcnoファイルID
+       @throws SQLException クエリにエラーが発生したときにスローします。
+    */
+    private long getGcnoFileID(final Function function) throws SQLException {
+	final String gcnoFile = function.getGCNOFile();
+	Long cachedID = gcnoFileMap.get(gcnoFile);
+	if (cachedID != null) {
+	    return cachedID;
+	}
+	long id = gcnoFileResolver.getGcnoFileID(gcnoFile);
+	if (id == -1) {
+	    gcnoFileRowAdder.execute();
+	    id = gcnoFileRowAdder.getGeneratedKey(1);
+	    System.err.println("gcnoFile " + function.getGCNOFile()
+			       + " not found, newly created");
+	}
+	gcnoFileMap.put(gcnoFile, id);
+	return id;
+    }
+
+    /**
        コミット情報をテーブルに登録します。
 
        @throws SQLException クエリにエラーが発生したときにスローします。
@@ -120,8 +162,9 @@ public final class CommitDeal {
 	    = source.getAllFunctionGraphs();
 	for (FunctionGraph functionGraph : allFunctionGraphs) {
 	    Function function = functionGraph.getFunction();
+	    long gcnoFileID = getGcnoFileID(function);
 	    long functionID = functionResolver.getFunctionID(
-		function.getName(), function.getGCNOFile(), projectID);
+		function.getName(), gcnoFileID, projectID);
 	    if (functionID == -1) {
 		functionRowAdder.execute();
 		functionID = functionRowAdder.getGeneratedKey(1);

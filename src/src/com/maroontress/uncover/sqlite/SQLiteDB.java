@@ -305,10 +305,11 @@ public final class SQLiteDB implements DB {
 	String template = String.format(
 	    "SELECT %s FROM %s g"
 	    + " INNER JOIN %s f ON f.id = g.functionID"
+	    + " INNER JOIN %s gf ON gf.id = f.gcnoFileID"
 	    + " INNER JOIN %s gs ON g.id = gs.graphID"
 	    + " WHERE g.buildID = ?",
 	    FieldArray.concatNames(ResultSetFunctionSource.class, ","),
-	    Table.GRAPH, Table.FUNCTION, Table.GRAPH_SUMMARY);
+	    Table.GRAPH, Table.FUNCTION, Table.GCNO_FILE, Table.GRAPH_SUMMARY);
 	Object[] params = new Object[] {buildID};
 
 	ListCreator<Function> creator = new ListCreator<Function>(con) {
@@ -423,6 +424,8 @@ public final class SQLiteDB implements DB {
 			       Table.GRAPH, "id");
 	removeUnreferencedRows(Table.FUNCTION, "id",
 			       Table.GRAPH, "functionID");
+	removeUnreferencedRows(Table.GCNO_FILE, "id",
+			       Table.FUNCTION, "gcnoFileID");
     }
 
     /**
@@ -608,9 +611,15 @@ public final class SQLiteDB implements DB {
 		throw new DBException("project not found: " + projectName);
 	    }
 
+	    GcnoFileResolver gcnoFileResolver = new GcnoFileResolver(con);
+	    long gcnoFileID = gcnoFileResolver.getGcnoFileID(gcnoFile);
+	    if (gcnoFileID == -1) {
+		throw new DBException("gcnoFile not found: " + gcnoFile);
+	    }
+
 	    FunctionResolver functionResolver = new FunctionResolver(con);
             long functionID = functionResolver.getFunctionID(
-		function, gcnoFile, projectID);
+		function, gcnoFileID, projectID);
 	    if (functionID == -1) {
 		String s = String.format(
 		    "project: %s; function %s (%s) not found.",

@@ -3,6 +3,7 @@ package com.maroontress.uncover.gxx;
 import com.maroontress.uncover.CxxDemangler;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -13,13 +14,6 @@ import java.util.regex.Matcher;
 public final class GxxV3Demangler implements CxxDemangler {
     /** */
     private static Logger logger;
-
-    static {
-	String name = GxxV3Demangler.class.getPackage().getName();
-	logger = Logger.getLogger(name);
-	logger.setUseParentHandlers(false);
-	logger.setLevel(Level.OFF);
-    }
 
     /** パーサのコンテキストです。 */
     private Context context;
@@ -36,12 +30,47 @@ public final class GxxV3Demangler implements CxxDemangler {
     */
     private CharSequence global;
 
+    static {
+	initializeLogging();
+    }
+
+    /**
+       このパッケージのロギングの機能を初期化します。
+    */
+    private static void initializeLogging() {
+	String name = GxxV3Demangler.class.getPackage().getName();
+	logger = Logger.getLogger(name);
+	logger.setUseParentHandlers(false);
+	logger.setLevel(Level.OFF);
+
+	String log = System.getProperty(name + ".log");
+	if (log == null) {
+	    return;
+	}
+	logger.addHandler(new ConsoleHandler());
+	logger.setLevel(Level.parse(log));
+    }
+
+    /**
+       G++V3デマングルパーサを実行します。
+
+       @param av コマンドラインオプション
+    */
+    public static void main(final String[] av) {
+	if (av.length == 0) {
+	    return;
+	}
+	GxxV3Demangler d = new GxxV3Demangler(av[0]);
+	System.out.println(d.getName());
+    }
+
     /**
        デマングルする文字列を指定して、インスタンスを生成します。
 
        @param name デマングルする文字列
     */
     public GxxV3Demangler(final String name) {
+	logger.info(name);
 	qualifiers = new HashSet<String>();
 	composite = null;
 	global = null;
@@ -49,10 +78,11 @@ public final class GxxV3Demangler implements CxxDemangler {
 	try {
 	    parseMangledName();
 	} catch (ContextException e) {
-	    if (logger.isLoggable(Level.INFO)) {
-		logger.log(Level.INFO, getClass().getName(), e);
-	    }
+	    logger.log(Level.INFO, name, e);
 	    composite = null;
+	} catch (RuntimeException e) {
+	    logger.log(Level.WARNING, name, e);
+	    throw e;
 	}
     }
 

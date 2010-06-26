@@ -1,17 +1,12 @@
 package com.maroontress.uncover.sqlite;
 
 import java.sql.Connection;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 
-// FunctionResolverとまとめる...
 /**
    gcnoファイル名を指定して、gcnoファイルIDを取得する機能を提供します。
 */
-public final class GcnoFileResolver {
-    /** gcnoファイルテーブルの行を取得するフェッチャです。 */
-    private Fetcher<GcnoFileRow> fetcher;
-
+public final class GcnoFileResolver extends Resolver<GcnoFileRow> {
     /**
        インスタンスを生成します。
 
@@ -19,18 +14,22 @@ public final class GcnoFileResolver {
        @throws SQLException クエリにエラーが発生したときにスローします。
     */
     public GcnoFileResolver(final Connection con) throws SQLException {
-	fetcher = new QuerierFactory<GcnoFileRow>(
-	    con, Table.GCNO_FILE, GcnoFileRow.class).createFetcher("id");
-	fetcher.setRow(new GcnoFileRow());
+	super(con);
     }
 
-    /**
-       gcnoファイルテーブルの行のインスタンスを取得します。
+    /** {@inheritDoc} */
+    protected Class<GcnoFileRow> getRowClass() {
+	return GcnoFileRow.class;
+    }
 
-       @return gcnoファイルテーブルの行
-    */
-    public GcnoFileRow getGcnoFileRow() {
-	return fetcher.getRow();
+    /** {@inheritDoc} */
+    protected GcnoFileRow createRow() {
+	return new GcnoFileRow();
+    }
+
+    /** {@inheritDoc} */
+    protected String getTableName() {
+	return Table.GCNO_FILE;
     }
 
     /**
@@ -43,18 +42,7 @@ public final class GcnoFileResolver {
        @throws SQLException クエリにエラーが発生したときにスローします。
     */
     public long getGcnoFileID(final String path) throws SQLException {
-	fetcher.getRow().set(path);
-	ResultSet rs = fetcher.executeQuery();
-
-	long id = -1;
-	int k;
-	for (k = 0; rs.next(); ++k) {
-	    id = rs.getLong("id");
-	}
-	if (k > 1) {
-	    String s = String.format("gcnoFile %s found more than one.", path);
-	    throw new TableInconsistencyException(s);
-	}
-	return id;
+	getRow().set(path);
+	return getID();
     }
 }

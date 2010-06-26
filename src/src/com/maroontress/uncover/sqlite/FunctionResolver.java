@@ -1,17 +1,13 @@
 package com.maroontress.uncover.sqlite;
 
 import java.sql.Connection;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
    関数名、gcnoファイル名、プロジェクト名を指定して、関数IDを取得する
    機能を提供します。
 */
-public final class FunctionResolver {
-    /** 関数テーブルの行を取得するフェッチャです。 */
-    private Fetcher<FunctionRow> fetcher;
-
+public final class FunctionResolver extends Resolver<FunctionRow> {
     /**
        インスタンスを生成します。
 
@@ -19,18 +15,22 @@ public final class FunctionResolver {
        @throws SQLException クエリにエラーが発生したときにスローします。
     */
     public FunctionResolver(final Connection con) throws SQLException {
-	fetcher = new QuerierFactory<FunctionRow>(
-	    con, Table.FUNCTION, FunctionRow.class).createFetcher("id");
-	fetcher.setRow(new FunctionRow());
+	super(con);
     }
 
-    /**
-       関数テーブルの行のインスタンスを取得します。
+    /** {@inheritDoc} */
+    protected Class<FunctionRow> getRowClass() {
+	return FunctionRow.class;
+    }
 
-       @return 関数テーブルの行
-    */
-    public FunctionRow getFunctionRow() {
-	return fetcher.getRow();
+    /** {@inheritDoc} */
+    protected FunctionRow createRow() {
+	return new FunctionRow();
+    }
+
+    /** {@inheritDoc} */
+    protected String getTableName() {
+	return Table.FUNCTION;
     }
 
     /**
@@ -48,20 +48,7 @@ public final class FunctionResolver {
     public long getFunctionID(final String functionName,
 			      final long gcnoFileID,
 			      final long projectID) throws SQLException {
-	fetcher.getRow().set(functionName, gcnoFileID, projectID);
-	ResultSet rs = fetcher.executeQuery();
-
-	long functionID = -1;
-	int k;
-	for (k = 0; rs.next(); ++k) {
-	    functionID = rs.getLong("id");
-	}
-	if (k > 1) {
-	    String s = String.format(
-		"function %s (gcnoFile=%d; project=%d) found more than one.",
-		functionName, gcnoFileID, projectID);
-	    throw new TableInconsistencyException(s);
-	}
-	return functionID;
+	getRow().set(functionName, gcnoFileID, projectID);
+	return getID();
     }
 }

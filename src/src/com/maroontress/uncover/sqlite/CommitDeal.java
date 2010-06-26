@@ -65,12 +65,12 @@ public final class CommitDeal {
 	functionResolver = new FunctionResolver(con);
 	functionRowAdder = new QuerierFactory<FunctionRow>(
 	    con, Table.FUNCTION, FunctionRow.class).createAdder();
-	functionRowAdder.setRow(functionResolver.getFunctionRow());
+	functionRowAdder.setRow(functionResolver.getRow());
 
 	gcnoFileResolver = new GcnoFileResolver(con);
 	gcnoFileRowAdder = new QuerierFactory<GcnoFileRow>(
 	    con, Table.GCNO_FILE, GcnoFileRow.class).createAdder();
-	gcnoFileRowAdder.setRow(gcnoFileResolver.getGcnoFileRow());
+	gcnoFileRowAdder.setRow(gcnoFileResolver.getRow());
 
 	graphRowAdder = new QuerierFactory<GraphRow>(
 	    con, Table.GRAPH, GraphRow.class).createAdder();

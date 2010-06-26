@@ -52,6 +52,7 @@ public final class InitDeal {
 	s.executeUpdate("CREATE TABLE " + Table.FUNCTION + " ("
 			+ "id INTEGER PRIMARY KEY, "
 			+ getTableDefinition(FunctionRow.class)
+			+ ", UNIQUE (name, gcnoFile, projectID)"
 			+ ")");
 	s.executeUpdate("CREATE TABLE " + Table.GRAPH + " ("
 			+ "id INTEGER PRIMARY KEY, "
